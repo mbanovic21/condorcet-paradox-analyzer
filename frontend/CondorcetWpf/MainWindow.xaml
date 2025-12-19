@@ -1,0 +1,84 @@
+<Window x:Class="CondorcetWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Condorcet Analyzer (WPF)" Height="820" Width="1100">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top bar -->
+        <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,12">
+            <Button Content="Load JSON..." Width="140" Margin="0,0,10,0" Command="{Binding LoadJsonCommand}"/>
+            <Button Content="Analyze" Width="120" Margin="0,0,10,0" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding HasInput}"/>
+            <TextBlock VerticalAlignment="Center" Text="{Binding Status}" />
+        </DockPanel>
+
+        <!-- Main -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: results + tables -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,12,0">
+                <StackPanel>
+                    <GroupBox Header="Summary" Margin="0,0,0,12">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="{Binding SummaryLine1}" FontSize="16" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SummaryLine2}" Margin="0,6,0,0" />
+                            <TextBlock Text="{Binding CycleText}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="Winners" Margin="0,0,0,12">
+                        <DataGrid ItemsSource="{Binding WinnersRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="180" Margin="10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Method" Binding="{Binding Method}" Width="*"/>
+                                <DataGridTextColumn Header="Winner" Binding="{Binding Winner}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+                    <GroupBox Header="Scores (Borda)" Margin="0,0,0,12">
+                        <DataGrid ItemsSource="{Binding BordaRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+                    <GroupBox Header="Scores (Plurality)">
+                        <DataGrid ItemsSource="{Binding PluralityRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Right: graph + pairwise matrix -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Graph" Grid.Row="0" Margin="0,0,0,12">
+                    <Grid Margin="10">
+                        <Image Source="{Binding GraphImage}" Stretch="Uniform"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Pairwise Wins Matrix A (1 means row beats column)" Grid.Row="1">
+                    <DataGrid ItemsSource="{Binding MatrixRows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True" Margin="10"/>
+                </GroupBox>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
