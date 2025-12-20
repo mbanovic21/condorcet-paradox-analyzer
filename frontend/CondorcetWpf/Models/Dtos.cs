@@ -33,6 +33,9 @@ public sealed class PairwiseResult
 
     [JsonPropertyName("A")]
     public List<List<int>> A { get; set; } = new();
+
+    [JsonPropertyName("margin")]
+    public List<List<int>> Margin { get; set; } = new();
 }
 
 public sealed class CycleResult
@@ -51,6 +54,12 @@ public sealed class MethodScores
 
     [JsonPropertyName("plurality")]
     public Dictionary<string, int> Plurality { get; set; } = new();
+
+    [JsonPropertyName("copeland")]
+    public Dictionary<string, int> Copeland { get; set; } = new();
+
+    [JsonPropertyName("minimax")]
+    public Dictionary<string, int> Minimax { get; set; } = new();
 }
 
 public sealed class AnalysisResult

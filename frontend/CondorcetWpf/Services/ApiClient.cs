@@ -18,10 +18,24 @@ public sealed class ApiClient
         };
     }
 
-    public async Task<AnalysisResult> AnalyzeAsync(ElectionInput input)
+    public async Task<AnalysisResult> AnalyzeAsync(
+    ElectionInput input,
+    bool saveArtifact = false,
+    string tag = "run",
+    string notes = ""
+)
     {
-        var resp = await _http.PostAsJsonAsync("/election/analyze", input);
+        var url = "/election/analyze";
+
+        if (saveArtifact)
+        {
+            // Query param names MUST match FastAPI: save_artifact, tag, notes
+            url += $"?save_artifact=true&tag={Uri.EscapeDataString(tag)}&notes={Uri.EscapeDataString(notes)}";
+        }
+
+        var resp = await _http.PostAsJsonAsync(url, input);
         resp.EnsureSuccessStatusCode();
+
         var result = await resp.Content.ReadFromJsonAsync<AnalysisResult>();
         if (result is null) throw new InvalidOperationException("Empty response from server.");
         return result;

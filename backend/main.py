@@ -19,5 +19,17 @@ def health():
     return {"status": "ok"}
 
 @app.post("/election/analyze", response_model=AnalysisResult)
-def election_analyze(payload: ElectionInput):
-    return analyze_election(payload)
+def election_analyze(
+    payload: ElectionInput,
+    save_artifact: bool = False,
+    tag: str = "run",
+    notes: str = "",
+):
+    result = analyze_election(payload)
+
+    if save_artifact:
+        from app.artifacts import save_run_artifact
+        save_run_artifact(payload, result, tag=tag, notes=notes)
+
+    return result
+

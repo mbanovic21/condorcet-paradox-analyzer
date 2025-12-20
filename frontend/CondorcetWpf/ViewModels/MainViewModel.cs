@@ -40,10 +40,18 @@ public sealed class MainViewModel : INotifyPropertyChanged
         SummaryLine1 = "No analysis yet.";
         SummaryLine2 = "";
         CycleText = "";
+
+        // Defaults for artifacts
+        SaveArtifact = false;
+        ArtifactTag = "run";
+        ArtifactNotes = "";
     }
 
     public bool HasInput => _input is not null;
 
+    // -----------------------
+    // UI state
+    // -----------------------
     private string _status = "";
     public string Status
     {
@@ -79,13 +87,46 @@ public sealed class MainViewModel : INotifyPropertyChanged
         set { _graphImage = value; OnPropertyChanged(); }
     }
 
+    // -----------------------
+    // Artifact saving options
+    // -----------------------
+    private bool _saveArtifact;
+    public bool SaveArtifact
+    {
+        get => _saveArtifact;
+        set { _saveArtifact = value; OnPropertyChanged(); }
+    }
+
+    private string _artifactTag = "run";
+    public string ArtifactTag
+    {
+        get => _artifactTag;
+        set { _artifactTag = value; OnPropertyChanged(); }
+    }
+
+    private string _artifactNotes = "";
+    public string ArtifactNotes
+    {
+        get => _artifactNotes;
+        set { _artifactNotes = value; OnPropertyChanged(); }
+    }
+
+    // -----------------------
+    // Tables
+    // -----------------------
     public ObservableCollection<RowKV> WinnersRows { get; } = new();
     public ObservableCollection<RowScore> BordaRows { get; } = new();
     public ObservableCollection<RowScore> PluralityRows { get; } = new();
+    public ObservableCollection<RowScore> CopelandRows { get; } = new();
+    public ObservableCollection<RowScore> MinimaxRows { get; } = new();
 
-    // For matrix: use dynamic rows where each row is a dictionary
-    public ObservableCollection<Dictionary<string, object>> MatrixRows { get; } = new();
+    // For matrices: each row is a dictionary => DataGrid auto-generates columns
+    public ObservableCollection<Dictionary<string, object>> MatrixARows { get; } = new();
+    public ObservableCollection<Dictionary<string, object>> MatrixMarginRows { get; } = new();
 
+    // -----------------------
+    // Commands
+    // -----------------------
     private void LoadJson()
     {
         var dlg = new OpenFileDialog
@@ -100,21 +141,17 @@ public sealed class MainViewModel : INotifyPropertyChanged
             var text = File.ReadAllText(dlg.FileName, Encoding.UTF8);
             _input = JsonSerializer.Deserialize<ElectionInput>(text, _jsonOpts);
             if (_input is null) throw new InvalidOperationException("Could not parse JSON.");
+
             Status = $"Loaded: {Path.GetFileName(dlg.FileName)} (candidates: {string.Join(", ", _input.Candidates)})";
             SummaryLine1 = "Ready to analyze.";
             SummaryLine2 = "";
             CycleText = "";
 
-            WinnersRows.Clear();
-            BordaRows.Clear();
-            PluralityRows.Clear();
-            MatrixRows.Clear();
-            GraphImage = null;
+            ClearResults();
 
             OnPropertyChanged(nameof(HasInput));
             AnalyzeCommand.RaiseCanExecuteChanged();
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "Load error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
@@ -127,73 +164,131 @@ public sealed class MainViewModel : INotifyPropertyChanged
         try
         {
             Status = "Analyzing...";
-            _result = await _api.AnalyzeAsync(_input);
+            _result = await _api.AnalyzeAsync(
+                _input,
+                saveArtifact: SaveArtifact,
+                tag: string.IsNullOrWhiteSpace(ArtifactTag) ? "run" : ArtifactTag,
+                notes: ArtifactNotes ?? ""
+            );
             Status = "Done.";
 
-            // Summary
-            if (!string.IsNullOrWhiteSpace(_result.CondorcetWinner))
-                SummaryLine1 = $"Condorcet winner: {_result.CondorcetWinner}";
-            else
-                SummaryLine1 = "No Condorcet winner.";
-
-            SummaryLine2 = _result.CycleInfo.HasCycle ? "Condorcet paradox detected (directed cycle exists)." : "No directed cycle detected.";
-
-            if (_result.CycleInfo.HasCycle && _result.CycleInfo.Cycle is not null)
-                CycleText = "Cycle: " + string.Join(" → ", _result.CycleInfo.Cycle);
-            else
-                CycleText = "";
-
-            // Winners table
-            WinnersRows.Clear();
-            foreach (var kv in _result.Winners.OrderBy(k => k.Key))
-                WinnersRows.Add(new RowKV(kv.Key, kv.Value ?? "(tie/none)"));
-
-            // Scores
-            BordaRows.Clear();
-            foreach (var kv in _result.Scores.Borda.OrderByDescending(k => k.Value))
-                BordaRows.Add(new RowScore(kv.Key, kv.Value));
-
-            PluralityRows.Clear();
-            foreach (var kv in _result.Scores.Plurality.OrderByDescending(k => k.Value))
-                PluralityRows.Add(new RowScore(kv.Key, kv.Value));
-
-            // Matrix A
-            MatrixRows.Clear();
-            var cands = _result.Pairwise.Candidates;
-            for (int i = 0; i < cands.Count; i++)
-            {
-                var row = new Dictionary<string, object>();
-                row["Row"] = cands[i];
-                for (int j = 0; j < cands.Count; j++)
-                    row[cands[j]] = _result.Pairwise.A[i][j];
-                MatrixRows.Add(row);
-            }
-
-            // Graph image
-            GraphImage = DecodeBase64Png(_result.GraphPngBase64);
-        }
-        catch (Exception ex)
+            ApplyResultToUi(_result);
+        } catch (Exception ex)
         {
             Status = "Error.";
             MessageBox.Show(ex.Message, "Analyze error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
+    // -----------------------
+    // Helpers
+    // -----------------------
+    private void ClearResults()
+    {
+        WinnersRows.Clear();
+        BordaRows.Clear();
+        PluralityRows.Clear();
+        CopelandRows.Clear();
+        MinimaxRows.Clear();
+        MatrixARows.Clear();
+        MatrixMarginRows.Clear();
+        GraphImage = null;
+    }
+
+    private void ApplyResultToUi(AnalysisResult result)
+    {
+        // Summary
+        if (!string.IsNullOrWhiteSpace(result.CondorcetWinner))
+            SummaryLine1 = $"Condorcet winner: {result.CondorcetWinner}";
+        else
+            SummaryLine1 = "No Condorcet winner.";
+
+        SummaryLine2 = result.CycleInfo.HasCycle
+            ? "Condorcet paradox detected (directed cycle exists)."
+            : "No directed cycle detected.";
+
+        if (result.CycleInfo.HasCycle && result.CycleInfo.Cycle is not null)
+            CycleText = "Cycle: " + string.Join(" → ", result.CycleInfo.Cycle);
+        else
+            CycleText = "";
+
+        // Winners table
+        WinnersRows.Clear();
+        foreach (var kv in result.Winners.OrderBy(k => k.Key))
+            WinnersRows.Add(new RowKV(kv.Key, kv.Value ?? "(tie/none)"));
+
+        // Scores
+        BordaRows.Clear();
+        foreach (var kv in result.Scores.Borda.OrderByDescending(k => k.Value))
+            BordaRows.Add(new RowScore(kv.Key, kv.Value));
+
+        PluralityRows.Clear();
+        foreach (var kv in result.Scores.Plurality.OrderByDescending(k => k.Value))
+            PluralityRows.Add(new RowScore(kv.Key, kv.Value));
+
+        CopelandRows.Clear();
+        foreach (var kv in result.Scores.Copeland.OrderByDescending(k => k.Value))
+            CopelandRows.Add(new RowScore(kv.Key, kv.Value));
+
+        MinimaxRows.Clear();
+        foreach (var kv in result.Scores.Minimax.OrderByDescending(k => k.Value))
+            MinimaxRows.Add(new RowScore(kv.Key, kv.Value));
+
+        // Matrices
+        var cands = result.Pairwise.Candidates;
+
+        // A (wins)
+        MatrixARows.Clear();
+        for (int i = 0; i < cands.Count; i++)
+        {
+            var row = new Dictionary<string, object>
+            {
+                ["Row"] = cands[i]
+            };
+            for (int j = 0; j < cands.Count; j++)
+                row[cands[j]] = result.Pairwise.A[i][j];
+            MatrixARows.Add(row);
+        }
+
+        // Margin
+        MatrixMarginRows.Clear();
+        for (int i = 0; i < cands.Count; i++)
+        {
+            var row = new Dictionary<string, object>
+            {
+                ["Row"] = cands[i]
+            };
+            for (int j = 0; j < cands.Count; j++)
+                row[cands[j]] = result.Pairwise.Margin[i][j];
+            MatrixMarginRows.Add(row);
+        }
+
+        // Graph image
+        GraphImage = DecodeBase64Png(result.GraphPngBase64);
+    }
+
     private static BitmapImage? DecodeBase64Png(string? b64)
     {
         if (string.IsNullOrWhiteSpace(b64)) return null;
+
         var bytes = Convert.FromBase64String(b64);
         var img = new BitmapImage();
+
         using var ms = new MemoryStream(bytes);
         img.BeginInit();
         img.CacheOption = BitmapCacheOption.OnLoad;
         img.StreamSource = ms;
         img.EndInit();
         img.Freeze();
+
         return img;
     }
 
+    // -----------------------
+    // INotifyPropertyChanged
+    // -----------------------
     public event PropertyChangedEventHandler? PropertyChanged;
+
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

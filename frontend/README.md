@@ -18,3 +18,6 @@ uvicorn main:app --reload --port 8000
 
 ## Notes
 - Base URL is `http://127.0.0.1:8000` (change in `MainViewModel` if needed).
+
+
+v2: shows Margin matrix and Copeland/Minimax methods.

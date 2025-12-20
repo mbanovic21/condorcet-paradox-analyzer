@@ -28,12 +28,15 @@ class ElectionInput(BaseModel):
 
 class PairwiseResult(BaseModel):
     candidates: List[str]
-    N: List[List[int]]  # N[i][j] = voters pref i over j
-    A: List[List[int]]  # A[i][j] = 1 if i beats j, else 0 (ties => 0)
+    N: List[List[int]]       # N[i][j] = voters pref i over j
+    A: List[List[int]]       # A[i][j] = 1 if i beats j, else 0 (ties => 0)
+    margin: List[List[int]]  # margin[i][j] = N[i][j] - N[j][i]
 
 class MethodScores(BaseModel):
     borda: Dict[str, int]
     plurality: Dict[str, int]
+    copeland: Dict[str, int]
+    minimax: Dict[str, int]  # higher is better (negative worst defeat, 0 if undefeated)
 
 class CycleResult(BaseModel):
     has_cycle: bool
@@ -45,5 +48,5 @@ class AnalysisResult(BaseModel):
     condorcet_winner: Optional[str] = None
     cycle_info: CycleResult
     scores: MethodScores
-    winners: Dict[str, Optional[str]]  # method -> winner
+    winners: Dict[str, Optional[str]]  # method -> winner (None for tie/no winner)
     graph_png_base64: Optional[str] = None

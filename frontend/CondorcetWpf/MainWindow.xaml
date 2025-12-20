@@ -9,9 +9,32 @@
         </Grid.RowDefinitions>
 
         <!-- Top bar -->
-        <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,12">
-            <Button Content="Load JSON..." Width="140" Margin="0,0,10,0" Command="{Binding LoadJsonCommand}"/>
-            <Button Content="Analyze" Width="120" Margin="0,0,10,0" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding HasInput}"/>
+        <DockPanel Grid.Row="0" LastChildFill="True" Margin="0,0,0,12">
+
+            <!-- Left controls -->
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <Button Content="Load JSON..." Width="140" Margin="0,0,10,0" Command="{Binding LoadJsonCommand}"/>
+                <Button Content="Analyze" Width="120" Margin="0,0,14,0" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding HasInput}"/>
+
+                <CheckBox Content="Save artifact"
+                  IsChecked="{Binding SaveArtifact}"
+                  VerticalAlignment="Center"
+                  Margin="0,0,12,0"/>
+
+                <TextBlock Text="Tag:" VerticalAlignment="Center"/>
+                <TextBox Text="{Binding ArtifactTag}"
+                 Width="140"
+                 Margin="6,0,12,0"
+                 VerticalAlignment="Center"/>
+
+                <TextBlock Text="Notes:" VerticalAlignment="Center"/>
+                <TextBox Text="{Binding ArtifactNotes}"
+                 Width="260"
+                 Margin="6,0,12,0"
+                 VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Status takes remaining space -->
             <TextBlock VerticalAlignment="Center" Text="{Binding Status}" />
         </DockPanel>
 
@@ -59,6 +82,25 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
+                
+                    <GroupBox Header="Scores (Copeland)" Margin="0,12,0,12">
+                        <DataGrid ItemsSource="{Binding CopelandRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+                    <GroupBox Header="Scores (Minimax / Simpson)">
+                        <DataGrid ItemsSource="{Binding MinimaxRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
                 </StackPanel>
             </ScrollViewer>
 
@@ -75,8 +117,15 @@
                     </Grid>
                 </GroupBox>
 
-                <GroupBox Header="Pairwise Wins Matrix A (1 means row beats column)" Grid.Row="1">
-                    <DataGrid ItemsSource="{Binding MatrixRows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True" Margin="10"/>
+                <GroupBox Header="Pairwise Matrices" Grid.Row="1">
+                    <TabControl Margin="10">
+                        <TabItem Header="A (wins)">
+                            <DataGrid ItemsSource="{Binding MatrixARows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                        </TabItem>
+                        <TabItem Header="Margin">
+                            <DataGrid ItemsSource="{Binding MatrixMarginRows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                        </TabItem>
+                    </TabControl>
                 </GroupBox>
             </Grid>
         </Grid>

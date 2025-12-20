@@ -8,6 +8,9 @@ __pycache__/
 venv/
 ENV/
 
+artifacts/runs/
+!artifacts/samples/
+
 pip-wheel-metadata/
 
 bin/
