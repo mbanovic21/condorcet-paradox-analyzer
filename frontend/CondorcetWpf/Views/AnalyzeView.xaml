@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="CondorcetWpf.Views.AnalyzeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: results + tables -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,12,0">
+            <StackPanel>
+                <GroupBox Header="Summary" Margin="0,0,0,12">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="{Binding SummaryLine1}" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding SummaryLine2}" Margin="0,6,0,0" />
+                        <TextBlock Text="{Binding CycleText}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding LastArtifactRunId, StringFormat=Artifact run: {0}}" Margin="0,10,0,0" Foreground="#6B7280"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Winners" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding WinnersRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="180" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Method" Binding="{Binding Method}" Width="*"/>
+                            <DataGridTextColumn Header="Winner" Binding="{Binding Winner}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <GroupBox Header="Scores (Borda)" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding BordaRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                            <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <GroupBox Header="Scores (Plurality)" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding PluralityRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                            <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <GroupBox Header="Scores (Copeland)" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding CopelandRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                            <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <GroupBox Header="Scores (Minimax / Simpson)">
+                    <DataGrid ItemsSource="{Binding MinimaxRows}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="220" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                            <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Right: graph + pairwise matrix -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Graph" Grid.Row="0" Margin="0,0,0,12">
+                <Grid Margin="10">
+                    <Image Source="{Binding GraphImage}" Stretch="Uniform"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Pairwise Matrices" Grid.Row="1">
+                <TabControl Margin="10">
+                    <TabItem Header="A (wins)">
+                        <DataGrid ItemsSource="{Binding MatrixARows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                    </TabItem>
+                    <TabItem Header="Margin">
+                        <DataGrid ItemsSource="{Binding MatrixMarginRows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                    </TabItem>
+                </TabControl>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>
