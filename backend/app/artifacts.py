@@ -63,6 +63,7 @@ def save_run_artifact(
     slug = _safe_slug(tag)
     run_dir = artifacts_root / f"{ts}_{slug}"
     run_dir.mkdir(parents=True, exist_ok=False)
+    run_id = run_dir.name
 
     # input.json
     (run_dir / "input.json").write_text(
@@ -91,16 +92,34 @@ def save_run_artifact(
     if extra_tags:
         tags.extend([_safe_slug(t) for t in extra_tags if t and t.strip()])
 
+    # računa n_voters iz ballots
+    n_voters = sum(b.count for b in payload.ballots)
+
+    cycle_len = None
+    if result.cycle_info.has_cycle and result.cycle_info.cycle:
+        # cycle includes repeated start node, e.g. A->B->C->A
+        cycle_len = max(0, len(result.cycle_info.cycle) - 1)
+
     meta = {
         "created_at": datetime.datetime.now().astimezone().isoformat(),
         "code_version": f"git:{_git_short_hash(repo_root)}",
-        "methods": list(result.winners.keys()),
         "notes": notes,
         "tags": tags,
+
+        # payload stats
+        "m_candidates": len(payload.candidates),
+        "n_ballots": len(payload.ballots),
+        "n_voters": n_voters,
+
+        # core results
+        "has_cycle": result.cycle_info.has_cycle,
+        "cycle_length": cycle_len,
+        "condorcet_winner": result.condorcet_winner,
+        "winners": result.winners,
     }
     (run_dir / "meta.json").write_text(
         json.dumps(meta, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
 
-    return run_dir
+    return run_id

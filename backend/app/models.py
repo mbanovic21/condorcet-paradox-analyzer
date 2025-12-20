@@ -50,3 +50,4 @@ class AnalysisResult(BaseModel):
     scores: MethodScores
     winners: Dict[str, Optional[str]]  # method -> winner (None for tie/no winner)
     graph_png_base64: Optional[str] = None
+    artifact_run_id: Optional[str] = None

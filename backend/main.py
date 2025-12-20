@@ -29,7 +29,8 @@ def election_analyze(
 
     if save_artifact:
         from app.artifacts import save_run_artifact
-        save_run_artifact(payload, result, tag=tag, notes=notes)
+        run_id = save_run_artifact(payload, result, tag=tag, notes=notes)
+        result.artifact_run_id = run_id
 
     return result
 

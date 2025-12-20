@@ -84,4 +84,7 @@ public sealed class AnalysisResult
 
     [JsonPropertyName("graph_png_base64")]
     public string? GraphPngBase64 { get; set; }
+
+    [JsonPropertyName("artifact_run_id")]
+    public string? ArtifactRunId { get; set; }
 }

@@ -170,7 +170,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 tag: string.IsNullOrWhiteSpace(ArtifactTag) ? "run" : ArtifactTag,
                 notes: ArtifactNotes ?? ""
             );
-            Status = "Done.";
+            if (SaveArtifact && !string.IsNullOrWhiteSpace(_result.ArtifactRunId))
+                Status = $"Done. Saved artifact run: {_result.ArtifactRunId}";
+            else
+                Status = "Done.";
 
             ApplyResultToUi(_result);
         } catch (Exception ex)
