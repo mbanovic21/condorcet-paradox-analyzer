@@ -29,6 +29,10 @@
                             Command="{Binding NavigateAnalyzeCommand}"
                             Style="{StaticResource NavButtonStyle}"/>
 
+                    <Button Content="DFS Simulation"
+                            Command="{Binding NavigateDfsSimulationCommand}"
+                            Style="{StaticResource NavButtonStyle}"/>
+
                     <Button Content="Artifacts"
                             Command="{Binding NavigateArtifactsCommand}"
                             Style="{StaticResource NavButtonStyle}"/>

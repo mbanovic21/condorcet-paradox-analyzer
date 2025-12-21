@@ -46,6 +46,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     // Views (ViewModels)
     public AnalyzeViewModel AnalyzeVm { get; }
+    public DfsSimulationViewModel DfsSimulationVm { get; }
     public DashboardViewModel DashboardVm { get; }
     public ArtifactsViewModel ArtifactsVm { get; }
     public SettingsViewModel SettingsVm { get; }
@@ -59,6 +60,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public RelayCommand NavigateDashboardCommand { get; }
     public RelayCommand NavigateAnalyzeCommand { get; }
+    public RelayCommand NavigateDfsSimulationCommand { get; }
     public RelayCommand NavigateArtifactsCommand { get; }
     public RelayCommand NavigateSettingsCommand { get; }
 
@@ -74,6 +76,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         );
 
         DashboardVm = new DashboardViewModel(AnalyzeVm);
+        DfsSimulationVm = new DfsSimulationViewModel(AnalyzeVm);
         ArtifactsVm = new ArtifactsViewModel(AnalyzeVm);
         SettingsVm = new SettingsViewModel(this);
 
@@ -84,6 +87,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         // Navigation
         NavigateDashboardCommand = new RelayCommand(() => CurrentView = DashboardVm);
         NavigateAnalyzeCommand = new RelayCommand(() => CurrentView = AnalyzeVm);
+        NavigateDfsSimulationCommand = new RelayCommand(() => CurrentView = DfsSimulationVm);
         NavigateArtifactsCommand = new RelayCommand(() => CurrentView = ArtifactsVm);
         NavigateSettingsCommand = new RelayCommand(() => CurrentView = SettingsVm);
 

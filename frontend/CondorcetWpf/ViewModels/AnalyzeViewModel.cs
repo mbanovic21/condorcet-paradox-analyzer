@@ -117,6 +117,14 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
         }
     }
 
+    private Dictionary<string, List<double>>? _graphLayout;
+    public Dictionary<string, List<double>>? GraphLayout
+    {
+        get => _graphLayout;
+        private set { _graphLayout = value; OnPropertyChanged(); }
+    }
+    public DfsTrace? LastDfsTrace { get; private set; }
+
     public DfsStep? CurrentTrace
     => (_traceSteps.Count == 0 || CurrentTraceIndex < 0 || CurrentTraceIndex >= _traceSteps.Count)
         ? null
@@ -210,6 +218,10 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
                 notes: ArtifactNotes ?? "",
                 includeTrace: IncludeTrace
             );
+
+            GraphLayout = _result.GraphLayout;
+            LastDfsTrace = _result.DfsTrace;
+            OnPropertyChanged(nameof(LastDfsTrace));
 
             if (SaveArtifact && !string.IsNullOrWhiteSpace(_result.ArtifactRunId))
             {

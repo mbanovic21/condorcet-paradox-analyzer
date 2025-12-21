@@ -132,4 +132,7 @@ public sealed class AnalysisResult
     
     [JsonPropertyName("dfs_trace")]
     public DfsTrace? DfsTrace { get; set; }
+
+    [JsonPropertyName("graph_layout")]
+    public Dictionary<string, List<double>>? GraphLayout { get; set; }
 }

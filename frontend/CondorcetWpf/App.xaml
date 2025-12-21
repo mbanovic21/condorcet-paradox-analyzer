@@ -40,6 +40,9 @@
         <DataTemplate DataType="{x:Type viewModels:AnalyzeViewModel}">
             <views:AnalyzeView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:DfsSimulationViewModel}">
+            <views:DfsSimulationView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:ArtifactsViewModel}">
             <views:ArtifactsView />
         </DataTemplate>
