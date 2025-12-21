@@ -1,6 +1,5 @@
 from __future__ import annotations
-
-from typing import List, Optional
+from typing import Dict, List, Optional
 import base64
 from io import BytesIO
 
@@ -66,3 +65,37 @@ def render_graph_png_base64(
     plt.close(fig)
 
     return base64.b64encode(buf.getvalue()).decode("ascii")
+
+def compute_layout_normalized(candidates: List[str], A: List[List[int]]) -> Optional[Dict[str, List[float]]]:
+    try:
+        import networkx as nx
+    except Exception:
+        return None
+
+    G = nx.DiGraph()
+    G.add_nodes_from(candidates)
+    m = len(candidates)
+    for i in range(m):
+        for j in range(m):
+            if A[i][j] == 1:
+                G.add_edge(candidates[i], candidates[j])
+
+    pos = nx.circular_layout(G)  # dict node -> np.array([x,y])
+
+    # normalize to 0..1
+    xs = [float(pos[c][0]) for c in candidates]
+    ys = [float(pos[c][1]) for c in candidates]
+    minx, maxx = min(xs), max(xs)
+    miny, maxy = min(ys), max(ys)
+
+    def norm(v, lo, hi):
+        if hi - lo < 1e-9:
+            return 0.5
+        return (v - lo) / (hi - lo)
+
+    layout: Dict[str, List[float]] = {}
+    for c in candidates:
+        x = float(pos[c][0])
+        y = float(pos[c][1])
+        layout[c] = [norm(x, minx, maxx), norm(y, miny, maxy)]
+    return layout

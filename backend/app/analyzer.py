@@ -10,7 +10,7 @@ from .methods import (
     minimax_scores,
     winner_from_scores,
 )
-from .rendering import render_graph_png_base64
+from .rendering import render_graph_png_base64, compute_layout_normalized
 
 
 def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> AnalysisResult:
@@ -45,6 +45,7 @@ def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> 
     }
 
     graph_png_b64 = render_graph_png_base64(input_data.candidates, A, margin, cycle)
+    layout = compute_layout_normalized(input_data.candidates, A)
 
     return AnalysisResult(
         candidates=input_data.candidates,
@@ -55,4 +56,5 @@ def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> 
         winners=winners,
         graph_png_base64=graph_png_b64,
         dfs_trace=dfs_trace,
+        graph_layout=layout,
     )

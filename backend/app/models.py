@@ -80,3 +80,4 @@ class AnalysisResult(BaseModel):
     graph_png_base64: Optional[str] = None
     artifact_run_id: Optional[str] = None
     dfs_trace: Optional[DfsTrace] = None
+    graph_layout: Optional[Dict[str, List[float]]] = None
