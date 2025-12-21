@@ -1,8 +1,4 @@
 from __future__ import annotations
-from typing import List, Optional
-from .models import DfsTrace, DfsStep
-
-from __future__ import annotations
 from typing import List, Optional, Dict, Tuple
 from .models import DfsTrace, DfsStep
 

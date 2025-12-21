@@ -21,6 +21,7 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
     private readonly ApiClient _api;
     private readonly Action<string> _setStatus;
     private readonly Action _notifyHasInputChanged;
+    private List<DfsStep> _traceSteps = new();
 
     private readonly JsonSerializerOptions _jsonOpts = new JsonSerializerOptions
     {
@@ -34,6 +35,10 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
     public RelayCommand LoadJsonCommand { get; }
     public RelayCommand AnalyzeCommand { get; }
 
+    public RelayCommand TracePrevCommand { get; }
+    public RelayCommand TraceNextCommand { get; }
+    public RelayCommand TraceResetCommand { get; }
+
     public AnalyzeViewModel(ApiClient api, Action<string> setStatus, Action notifyHasInputChanged)
     {
         _api = api;
@@ -42,6 +47,25 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
         LoadJsonCommand = new RelayCommand(LoadJson);
         AnalyzeCommand = new RelayCommand(async () => await AnalyzeAsync(), () => HasInput);
+
+        TracePrevCommand = new RelayCommand(() => CurrentTraceIndex = Math.Max(0, CurrentTraceIndex - 1), () => _traceSteps.Count > 0 && CurrentTraceIndex > 0);
+        TraceNextCommand = new RelayCommand(() => CurrentTraceIndex = Math.Min(_traceSteps.Count - 1, CurrentTraceIndex + 1), () => _traceSteps.Count > 0 && CurrentTraceIndex < _traceSteps.Count - 1);
+        TraceResetCommand = new RelayCommand(() => CurrentTraceIndex = 0, () => _traceSteps.Count > 0);
+
+        TracePrevCommand = new RelayCommand(
+            () => CurrentTraceIndex = Math.Max(0, CurrentTraceIndex - 1),
+            () => HasTrace && CurrentTraceIndex > 0
+        );
+
+        TraceNextCommand = new RelayCommand(
+            () => CurrentTraceIndex = Math.Min(_traceSteps.Count - 1, CurrentTraceIndex + 1),
+            () => HasTrace && CurrentTraceIndex < _traceSteps.Count - 1
+        );
+
+        TraceResetCommand = new RelayCommand(
+            () => CurrentTraceIndex = 0,
+            () => HasTrace
+        );
 
         SummaryLine1 = "No analysis yet.";
         SummaryLine2 = "";
@@ -52,23 +76,74 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
     // Artifact options (set by shell)
     private bool _saveArtifact;
-    public bool SaveArtifact { get => _saveArtifact; set { _saveArtifact = value; OnPropertyChanged(); } }
+    public bool SaveArtifact { 
+        get => _saveArtifact; 
+        set { _saveArtifact = value; OnPropertyChanged(); } 
+    }
 
     private string _artifactTag = "run";
-    public string ArtifactTag { get => _artifactTag; set { _artifactTag = value; OnPropertyChanged(); } }
+    public string ArtifactTag { 
+        get => _artifactTag; 
+        set { _artifactTag = value; OnPropertyChanged(); } 
+    }
 
     private string _artifactNotes = "";
-    public string ArtifactNotes { get => _artifactNotes; set { _artifactNotes = value; OnPropertyChanged(); } }
+    public string ArtifactNotes { 
+        get => _artifactNotes; 
+        set { _artifactNotes = value; OnPropertyChanged(); } 
+    }
+
+    private bool _includeTrace;
+    public bool IncludeTrace
+    {
+        get => _includeTrace;
+        set { _includeTrace = value; OnPropertyChanged(); }
+    }
+
+    private int _currentTraceIndex;
+    public bool HasTrace => _traceSteps.Count > 0;
+
+    public int CurrentTraceIndex
+    {
+        get => _currentTraceIndex;
+        set { _currentTraceIndex = value; 
+            OnPropertyChanged(); 
+            OnPropertyChanged(nameof(CurrentTrace)); 
+            OnPropertyChanged(nameof(CurrentStackText));
+
+            TracePrevCommand.RaiseCanExecuteChanged();
+            TraceNextCommand.RaiseCanExecuteChanged();
+            TraceResetCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    public DfsStep? CurrentTrace
+    => (_traceSteps.Count == 0 || CurrentTraceIndex < 0 || CurrentTraceIndex >= _traceSteps.Count)
+        ? null
+        : _traceSteps[CurrentTraceIndex];
+
+    public string CurrentStackText
+        => CurrentTrace is null ? "" : string.Join(" → ", CurrentTrace.Stack);
+
 
     // Result summary
     private string _summary1 = "";
-    public string SummaryLine1 { get => _summary1; set { _summary1 = value; OnPropertyChanged(); } }
+    public string SummaryLine1 { 
+        get => _summary1; 
+        set { _summary1 = value; OnPropertyChanged(); } 
+    }
 
     private string _summary2 = "";
-    public string SummaryLine2 { get => _summary2; set { _summary2 = value; OnPropertyChanged(); } }
+    public string SummaryLine2 { 
+        get => _summary2; 
+        set { _summary2 = value; OnPropertyChanged(); } 
+    }
 
     private string _cycleText = "";
-    public string CycleText { get => _cycleText; set { _cycleText = value; OnPropertyChanged(); } }
+    public string CycleText { 
+        get => _cycleText; 
+        set { _cycleText = value; OnPropertyChanged(); } 
+    }
 
     private BitmapImage? _graphImage;
     public BitmapImage? GraphImage { get => _graphImage; set { _graphImage = value; OnPropertyChanged(); } }
@@ -84,6 +159,8 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
     public ObservableCollection<Dictionary<string, object>> MatrixARows { get; } = new();
     public ObservableCollection<Dictionary<string, object>> MatrixMarginRows { get; } = new();
+
+    public ObservableCollection<TraceRow> TraceRows { get; } = new();
 
     private void LoadJson()
     {
@@ -130,7 +207,8 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
                 _input,
                 saveArtifact: SaveArtifact,
                 tag: string.IsNullOrWhiteSpace(ArtifactTag) ? "run" : ArtifactTag,
-                notes: ArtifactNotes ?? ""
+                notes: ArtifactNotes ?? "",
+                includeTrace: IncludeTrace
             );
 
             if (SaveArtifact && !string.IsNullOrWhiteSpace(_result.ArtifactRunId))
@@ -143,11 +221,37 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
             }
 
             ApplyResultToUi(_result);
+            LoadTrace(_result.DfsTrace);
         } catch (Exception ex)
         {
             _setStatus("Error.");
             MessageBox.Show(ex.Message, "Analyze error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private void LoadTrace(DfsTrace? trace)
+    {
+        _traceSteps = trace?.Steps ?? new List<CondorcetWpf.Models.DfsStep>();
+
+        TraceRows.Clear();
+        foreach (var s in _traceSteps)
+        {
+            TraceRows.Add(new TraceRow(
+                s.Index,
+                s.Action,
+                s.U ?? "",
+                s.V ?? "",
+                s.Message ?? "",
+                string.Join(" → ", s.Stack)
+            ));
+        }
+
+        CurrentTraceIndex = _traceSteps.Count > 0 ? 0 : 0;
+
+        OnPropertyChanged(nameof(HasTrace));
+        TracePrevCommand.RaiseCanExecuteChanged();
+        TraceNextCommand.RaiseCanExecuteChanged();
+        TraceResetCommand.RaiseCanExecuteChanged();
     }
 
     private void ClearTables()
@@ -242,3 +346,4 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
 public sealed record RowKV(string Method, string Winner);
 public sealed record RowScore(string Candidate, int Score);
+public sealed record TraceRow(int Index, string Action, string U, string V, string Message, string Stack);

@@ -76,6 +76,11 @@
                                   VerticalAlignment="Center"
                                   IsChecked="{Binding SaveArtifact}"/>
 
+                        <CheckBox Content="Include DFS trace"
+                                  Margin="14,0,0,0"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{Binding IncludeTrace}"/>
+
                         <TextBlock Text="Tag:" Margin="12,0,0,0" VerticalAlignment="Center"/>
                         <TextBox Text="{Binding ArtifactTag}" Width="120" Margin="6,0,0,0"/>
 

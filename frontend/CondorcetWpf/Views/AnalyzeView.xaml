@@ -83,6 +83,43 @@
 
             <GroupBox Header="Pairwise Matrices" Grid.Row="1">
                 <TabControl Margin="10">
+                    <TabItem Header="DFS Simulation">
+                        <Grid Margin="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8">
+                                <Button Content="⟵ Prev" Width="90" Margin="0,0,8,0" Command="{Binding TracePrevCommand}"/>
+                                <Button Content="Next ⟶" Width="90" Margin="0,0,8,0" Command="{Binding TraceNextCommand}"/>
+                                <Button Content="Reset" Width="90" Command="{Binding TraceResetCommand}"/>
+                                <TextBlock Text="{Binding CurrentTraceIndex, StringFormat=Step: {0}}" Margin="16,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="1"
+                                   Text="{Binding CurrentStackText, StringFormat=Stack: {0}}"
+                                   Foreground="#374151"
+                                   Margin="0,0,0,8"
+                                   TextWrapping="Wrap"/>
+
+                            <DataGrid Grid.Row="2"
+                                  ItemsSource="{Binding TraceRows}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="60"/>
+                                    <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="110"/>
+                                    <DataGridTextColumn Header="u" Binding="{Binding U}" Width="70"/>
+                                    <DataGridTextColumn Header="v" Binding="{Binding V}" Width="70"/>
+                                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                                    <DataGridTextColumn Header="Stack" Binding="{Binding Stack}" Width="220"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
                     <TabItem Header="A (wins)">
                         <DataGrid ItemsSource="{Binding MatrixARows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
                     </TabItem>

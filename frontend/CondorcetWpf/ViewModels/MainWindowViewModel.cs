@@ -21,6 +21,13 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         set { _saveArtifact = value; OnPropertyChanged(); AnalyzeVm.SaveArtifact = value; }
     }
 
+    private bool _includeTrace = true;
+    public bool IncludeTrace
+    {
+        get => _includeTrace;
+        set { _includeTrace = value; OnPropertyChanged(); AnalyzeVm.IncludeTrace = value; }
+    }
+
     private string _artifactTag = "run";
     public string ArtifactTag
     {

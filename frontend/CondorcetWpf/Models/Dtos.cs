@@ -62,6 +62,48 @@ public sealed class MethodScores
     public Dictionary<string, int> Minimax { get; set; } = new();
 }
 
+public sealed class DfsTrace
+{
+    [JsonPropertyName("steps")]
+    public List<DfsStep> Steps { get; set; } = new();
+
+    [JsonPropertyName("has_cycle")]
+    public bool HasCycle { get; set; }
+
+    [JsonPropertyName("cycle")]
+    public List<string>? Cycle { get; set; }
+}
+
+public sealed class DfsStep
+{
+    [JsonPropertyName("index")]
+    public int Index { get; set; }
+
+    [JsonPropertyName("action")]
+    public string Action { get; set; } = "";
+
+    [JsonPropertyName("u")]
+    public string? U { get; set; }
+
+    [JsonPropertyName("v")]
+    public string? V { get; set; }
+
+    [JsonPropertyName("stack")]
+    public List<string> Stack { get; set; } = new();
+
+    [JsonPropertyName("colors")]
+    public Dictionary<string, string> Colors { get; set; } = new();
+
+    [JsonPropertyName("parent")]
+    public Dictionary<string, string?> Parent { get; set; } = new();
+
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
+
+    [JsonPropertyName("cycle")]
+    public List<string>? Cycle { get; set; }
+}
+
 public sealed class AnalysisResult
 {
     [JsonPropertyName("candidates")]
@@ -87,4 +129,7 @@ public sealed class AnalysisResult
 
     [JsonPropertyName("artifact_run_id")]
     public string? ArtifactRunId { get; set; }
+    
+    [JsonPropertyName("dfs_trace")]
+    public DfsTrace? DfsTrace { get; set; }
 }
