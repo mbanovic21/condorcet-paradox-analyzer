@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "ballots": [
+    {
+      "ranking": [
+        "A",
+        "C",
+        "D",
+        "B"
+      ],
+      "count": 2
+    },
+    {
+      "ranking": [
+        "B",
+        "C",
+        "D",
+        "A"
+      ],
+      "count": 2
+    },
+    {
+      "ranking": [
+        "C",
+        "D",
+        "A",
+        "B"
+      ],
+      "count": 1
+    },
+    {
+      "ranking": [
+        "C",
+        "D",
+        "B",
+        "A"
+      ],
+      "count": 1
+    }
+  ]
+}
