@@ -79,6 +79,13 @@ def save_run_artifact(
         encoding="utf-8",
     )
 
+    # dfs_trace.json
+    if result.dfs_trace is not None:
+        (run_dir / "dfs_trace.json").write_text(
+            result.dfs_trace.model_dump_json(indent=2),
+            encoding="utf-8",
+        )
+
     # graph.png
     if result.graph_png_base64:
         try:

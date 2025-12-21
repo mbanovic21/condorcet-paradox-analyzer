@@ -24,8 +24,9 @@ def election_analyze(
     save_artifact: bool = False,
     tag: str = "run",
     notes: str = "",
+    include_trace: bool = False,
 ):
-    result = analyze_election(payload)
+    result = analyze_election(payload, include_trace=include_trace)
 
     if save_artifact:
         from app.artifacts import save_run_artifact

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .models import ElectionInput, AnalysisResult, PairwiseResult, MethodScores, CycleResult
 from .pairwise import compute_pairwise
-from .graph_algorithms import find_condorcet_winner, dfs_find_cycle
+from .graph_algorithms import dfs_with_trace, find_condorcet_winner, dfs_find_cycle
 from .methods import (
     borda_scores,
     plurality_scores,
@@ -13,11 +13,16 @@ from .methods import (
 from .rendering import render_graph_png_base64
 
 
-def analyze_election(input_data: ElectionInput) -> AnalysisResult:
+def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> AnalysisResult:
     N, A, margin = compute_pairwise(input_data)
 
     condorcet = find_condorcet_winner(input_data.candidates, A)
-    cycle = dfs_find_cycle(input_data.candidates, A)
+
+    dfs_trace = None
+    if include_trace:
+        cycle, dfs_trace = dfs_with_trace(input_data.candidates, A)
+    else:
+        cycle = dfs_find_cycle(input_data.candidates, A)
 
     borda = borda_scores(input_data)
     plurality = plurality_scores(input_data)
@@ -49,4 +54,5 @@ def analyze_election(input_data: ElectionInput) -> AnalysisResult:
         scores=scores,
         winners=winners,
         graph_png_base64=graph_png_b64,
+        dfs_trace=dfs_trace,
     )

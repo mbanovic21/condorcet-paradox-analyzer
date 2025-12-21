@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Literal
 
 class Ballot(BaseModel):
     ranking: List[str] = Field(..., description="Strict ranking of candidates, best to worst")
@@ -42,6 +42,34 @@ class CycleResult(BaseModel):
     has_cycle: bool
     cycle: Optional[List[str]] = None  # e.g. ["A","B","C","A"]
 
+class DfsStep(BaseModel):
+    index: int
+    action: Literal[
+        "START",
+        "ENTER",
+        "EDGE",
+        "TREE_EDGE",
+        "BACK_EDGE",
+        "EXIT",
+        "FOUND_CYCLE",
+        "END",
+    ]
+    u: Optional[str] = None
+    v: Optional[str] = None
+
+    # For UI simulation
+    stack: List[str] = Field(default_factory=list)              # current recursion stack as labels
+    colors: Dict[str, str] = Field(default_factory=dict)        # candidate -> WHITE/GRAY/BLACK
+    parent: Dict[str, Optional[str]] = Field(default_factory=dict)
+
+    message: Optional[str] = None
+    cycle: Optional[List[str]] = None  # filled on FOUND_CYCLE
+
+class DfsTrace(BaseModel):
+    steps: List[DfsStep] = Field(default_factory=list)
+    has_cycle: bool = False
+    cycle: Optional[List[str]] = None
+
 class AnalysisResult(BaseModel):
     candidates: List[str]
     pairwise: PairwiseResult
@@ -51,3 +79,4 @@ class AnalysisResult(BaseModel):
     winners: Dict[str, Optional[str]]  # method -> winner (None for tie/no winner)
     graph_png_base64: Optional[str] = None
     artifact_run_id: Optional[str] = None
+    dfs_trace: Optional[DfsTrace] = None
