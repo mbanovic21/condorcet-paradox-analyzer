@@ -16,7 +16,7 @@ def render_graph_png_base64(
     """
     try:
         import matplotlib
-        matplotlib.use("Agg")  # headless backend (no GUI)
+        matplotlib.use("Agg")
         import networkx as nx
         import matplotlib.pyplot as plt
     except Exception:
@@ -80,9 +80,8 @@ def compute_layout_normalized(candidates: List[str], A: List[List[int]]) -> Opti
             if A[i][j] == 1:
                 G.add_edge(candidates[i], candidates[j])
 
-    pos = nx.circular_layout(G)  # dict node -> np.array([x,y])
+    pos = nx.circular_layout(G)
 
-    # normalize to 0..1
     xs = [float(pos[c][0]) for c in candidates]
     ys = [float(pos[c][1]) for c in candidates]
     minx, maxx = min(xs), max(xs)

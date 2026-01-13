@@ -55,7 +55,6 @@ def dfs_with_trace(candidates: List[str], A: List[List[int]]) -> Tuple[Optional[
                 yield v
 
     def reconstruct(u: int, v: int) -> List[str]:
-        # reconstruct cycle from u -> v where v is GRAY
         path = [v]
         cur = u
         while cur != v and cur != -1:

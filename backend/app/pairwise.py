@@ -24,7 +24,7 @@ def compute_pairwise(input_data: ElectionInput) -> Tuple[List[List[int]], List[L
         if len(set(r)) != len(r):
             raise ValueError(f"Ballot ranking contains duplicates. Got: {r}")
 
-        pos = {cand: p for p, cand in enumerate(r)}  # lower = better
+        pos = {cand: p for p, cand in enumerate(r)}
         for i in range(m):
             for j in range(m):
                 if i == j:

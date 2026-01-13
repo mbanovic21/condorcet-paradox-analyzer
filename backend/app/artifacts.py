@@ -11,7 +11,6 @@ from .models import ElectionInput, AnalysisResult
 
 
 def _repo_root() -> Path:
-    # backend/app/artifacts.py -> backend/app -> backend -> repo root
     return Path(__file__).resolve().parents[2]
 
 
@@ -65,13 +64,11 @@ def save_run_artifact(
     run_dir.mkdir(parents=True, exist_ok=False)
     run_id = run_dir.name
 
-    # input.json
     (run_dir / "input.json").write_text(
         payload.model_dump_json(indent=2),
         encoding="utf-8",
     )
 
-    # output.json (strip image field; store as graph.png)
     out_dict = result.model_dump()
     out_dict["graph_png_base64"] = None
     (run_dir / "output.json").write_text(
@@ -79,7 +76,6 @@ def save_run_artifact(
         encoding="utf-8",
     )
 
-    # graph.png
     if result.graph_png_base64:
         try:
             png_bytes = base64.b64decode(result.graph_png_base64)
@@ -87,31 +83,26 @@ def save_run_artifact(
         except Exception:
             pass
 
-    # dfs_trace.json
     if result.dfs_trace is not None:
         (run_dir / "dfs_trace.json").write_text(
             result.dfs_trace.model_dump_json(indent=2),
             encoding="utf-8",
         )
     
-    # graph_layout.json
     if result.graph_layout is not None:
         (run_dir / "graph_layout.json").write_text(
             json.dumps(result.graph_layout, indent=2),
             encoding="utf-8"
         )
 
-    # meta.json
     tags = [slug]
     if extra_tags:
         tags.extend([_safe_slug(t) for t in extra_tags if t and t.strip()])
 
-    # računa n_voters iz ballots
     n_voters = sum(b.count for b in payload.ballots)
 
     cycle_len = None
     if result.cycle_info.has_cycle and result.cycle_info.cycle:
-        # cycle includes repeated start node, e.g. A->B->C->A
         cycle_len = max(0, len(result.cycle_info.cycle) - 1)
 
     meta = {
@@ -120,12 +111,10 @@ def save_run_artifact(
         "notes": notes,
         "tags": tags,
 
-        # payload stats
         "m_candidates": len(payload.candidates),
         "n_ballots": len(payload.ballots),
         "n_voters": n_voters,
 
-        # core results
         "has_cycle": result.cycle_info.has_cycle,
         "cycle_length": cycle_len,
         "condorcet_winner": result.condorcet_winner,

@@ -28,19 +28,19 @@ class ElectionInput(BaseModel):
 
 class PairwiseResult(BaseModel):
     candidates: List[str]
-    N: List[List[int]]       # N[i][j] = voters pref i over j
-    A: List[List[int]]       # A[i][j] = 1 if i beats j, else 0 (ties => 0)
-    margin: List[List[int]]  # margin[i][j] = N[i][j] - N[j][i]
+    N: List[List[int]]
+    A: List[List[int]] 
+    margin: List[List[int]]
 
 class MethodScores(BaseModel):
     borda: Dict[str, int]
     plurality: Dict[str, int]
     copeland: Dict[str, int]
-    minimax: Dict[str, int]  # higher is better (negative worst defeat, 0 if undefeated)
+    minimax: Dict[str, int]
 
 class CycleResult(BaseModel):
     has_cycle: bool
-    cycle: Optional[List[str]] = None  # e.g. ["A","B","C","A"]
+    cycle: Optional[List[str]] = None
 
 class DfsStep(BaseModel):
     index: int
@@ -57,13 +57,12 @@ class DfsStep(BaseModel):
     u: Optional[str] = None
     v: Optional[str] = None
 
-    # For UI simulation
-    stack: List[str] = Field(default_factory=list)              # current recursion stack as labels
-    colors: Dict[str, str] = Field(default_factory=dict)        # candidate -> WHITE/GRAY/BLACK
+    stack: List[str] = Field(default_factory=list) 
+    colors: Dict[str, str] = Field(default_factory=dict) 
     parent: Dict[str, Optional[str]] = Field(default_factory=dict)
 
     message: Optional[str] = None
-    cycle: Optional[List[str]] = None  # filled on FOUND_CYCLE
+    cycle: Optional[List[str]] = None
 
 class DfsTrace(BaseModel):
     steps: List[DfsStep] = Field(default_factory=list)
@@ -76,7 +75,7 @@ class AnalysisResult(BaseModel):
     condorcet_winner: Optional[str] = None
     cycle_info: CycleResult
     scores: MethodScores
-    winners: Dict[str, Optional[str]]  # method -> winner (None for tie/no winner)
+    winners: Dict[str, Optional[str]]
     graph_png_base64: Optional[str] = None
     artifact_run_id: Optional[str] = None
     dfs_trace: Optional[DfsTrace] = None
