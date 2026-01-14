@@ -121,10 +121,10 @@
                         </Grid>
                     </TabItem>
                     <TabItem Header="A (wins)">
-                        <DataGrid ItemsSource="{Binding MatrixARows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                        <DataGrid ItemsSource="{Binding MatrixAView}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
                     </TabItem>
                     <TabItem Header="Margin">
-                        <DataGrid ItemsSource="{Binding MatrixMarginRows}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                        <DataGrid ItemsSource="{Binding MatrixMarginView}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
                     </TabItem>
                 </TabControl>
             </GroupBox>

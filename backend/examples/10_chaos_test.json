@@ -1,0 +1,13 @@
+{
+  "candidates": ["A", "B", "C", "D", "E"],
+  "ballots": [
+    { "ranking": ["A", "B", "C", "D", "E"], "count": 10 },
+    { "ranking": ["B", "C", "A", "D", "E"], "count": 10 },
+    { "ranking": ["C", "A", "B", "D", "E"], "count": 10 },
+    { "ranking": ["D", "E", "B", "C", "A"], "count": 7 },
+    { "ranking": ["E", "D", "B", "C", "A"], "count": 7 },
+    { "ranking": ["B", "D", "E", "C", "A"], "count": 2 },
+    { "ranking": ["C", "E", "D", "B", "A"], "count": 2 },
+    { "ranking": ["A", "D", "E", "B", "C"], "count": 1 }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "candidates": ["A", "B", "C", "D", "E", "F", "G"],
+  "ballots": [
+    { "ranking": ["A", "B", "C", "D", "E", "F", "G"], "count": 30 },
+    { "ranking": ["B", "C", "A", "E", "F", "D", "G"], "count": 30 },
+    { "ranking": ["C", "A", "B", "F", "D", "E", "G"], "count": 30 },
+
+    { "ranking": ["D", "E", "A", "B", "C", "F", "G"], "count": 18 },
+    { "ranking": ["E", "F", "B", "C", "A", "D", "G"], "count": 18 },
+    { "ranking": ["F", "D", "C", "A", "B", "E", "G"], "count": 18 },
+
+    { "ranking": ["B", "D", "E", "F", "C", "A", "G"], "count": 12 },
+    { "ranking": ["C", "E", "F", "D", "A", "B", "G"], "count": 12 },
+    { "ranking": ["A", "F", "D", "E", "B", "C", "G"], "count": 12 },
+
+    { "ranking": ["G", "A", "B", "C", "D", "E", "F"], "count": 9 },
+    { "ranking": ["G", "B", "C", "A", "E", "F", "D"], "count": 9 },
+    { "ranking": ["G", "C", "A", "B", "F", "D", "E"], "count": 9 },
+
+    { "ranking": ["D", "C", "B", "A", "E", "F", "G"], "count": 7 },
+    { "ranking": ["E", "A", "C", "B", "F", "D", "G"], "count": 7 },
+    { "ranking": ["F", "B", "A", "C", "D", "E", "G"], "count": 7 }
+  ]
+}

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using CondorcetWpf.Models;
 using CondorcetWpf.Services;
+using System.Data;
 
 namespace CondorcetWpf.ViewModels;
 
@@ -74,7 +75,6 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
     public bool HasInput => _input is not null;
 
-    // Artifact options (set by shell)
     private bool _saveArtifact;
     public bool SaveArtifact { 
         get => _saveArtifact; 
@@ -134,7 +134,6 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
         => CurrentTrace is null ? "" : string.Join(" → ", CurrentTrace.Stack);
 
 
-    // Result summary
     private string _summary1 = "";
     public string SummaryLine1 { 
         get => _summary1; 
@@ -169,6 +168,20 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
     public ObservableCollection<Dictionary<string, object>> MatrixMarginRows { get; } = new();
 
     public ObservableCollection<TraceRow> TraceRows { get; } = new();
+
+    private DataView? _matrixAView;
+    public DataView? MatrixAView
+    {
+        get => _matrixAView;
+        set { _matrixAView = value; OnPropertyChanged(); }
+    }
+
+    private DataView? _matrixMarginView;
+    public DataView? MatrixMarginView
+    {
+        get => _matrixMarginView;
+        set { _matrixMarginView = value; OnPropertyChanged(); }
+    }
 
     private void LoadJson()
     {
@@ -315,23 +328,37 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
         var cands = result.Pairwise.Candidates;
 
-        MatrixARows.Clear();
-        for (int i = 0; i < cands.Count; i++)
-        {
-            var row = new Dictionary<string, object> { ["Row"] = cands[i] };
-            for (int j = 0; j < cands.Count; j++)
-                row[cands[j]] = result.Pairwise.A[i][j];
-            MatrixARows.Add(row);
-        }
+        DataTable dtA = new DataTable();
+        dtA.Columns.Add("vs", typeof(string));
+        foreach (var c in cands) dtA.Columns.Add(c, typeof(int));
 
-        MatrixMarginRows.Clear();
         for (int i = 0; i < cands.Count; i++)
         {
-            var row = new Dictionary<string, object> { ["Row"] = cands[i] };
+            DataRow row = dtA.NewRow();
+            row[0] = cands[i];
             for (int j = 0; j < cands.Count; j++)
-                row[cands[j]] = result.Pairwise.Margin[i][j];
-            MatrixMarginRows.Add(row);
+            {
+                row[j + 1] = result.Pairwise.A[i][j];
+            }
+            dtA.Rows.Add(row);
         }
+        MatrixAView = dtA.DefaultView;
+
+        DataTable dtM = new DataTable();
+        dtM.Columns.Add("vs", typeof(string));
+        foreach (var c in cands) dtM.Columns.Add(c, typeof(int));
+
+        for (int i = 0; i < cands.Count; i++)
+        {
+            DataRow row = dtM.NewRow();
+            row[0] = cands[i];
+            for (int j = 0; j < cands.Count; j++)
+            {
+                row[j + 1] = result.Pairwise.Margin[i][j];
+            }
+            dtM.Rows.Add(row);
+        }
+        MatrixMarginView = dtM.DefaultView;
 
         GraphImage = DecodeBase64Png(result.GraphPngBase64);
     }

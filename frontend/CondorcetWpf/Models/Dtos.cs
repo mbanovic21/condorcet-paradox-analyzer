@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace CondorcetWpf.Models;
 
-// Input
 public sealed class Ballot
 {
     [JsonPropertyName("ranking")]
@@ -22,7 +21,6 @@ public sealed class ElectionInput
     public List<Ballot> Ballots { get; set; } = new();
 }
 
-// Output
 public sealed class PairwiseResult
 {
     [JsonPropertyName("candidates")]

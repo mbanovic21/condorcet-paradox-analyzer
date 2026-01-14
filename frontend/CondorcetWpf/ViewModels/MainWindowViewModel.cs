@@ -10,7 +10,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public string BackendBaseUrl { get; }
 
-    // Shared topbar state
     private string _status = "Load a JSON file, then click Analyze (backend must be running).";
     public string Status { get => _status; set { _status = value; OnPropertyChanged(); } }
 
@@ -44,7 +43,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public bool HasInput => AnalyzeVm.HasInput;
 
-    // Views (ViewModels)
     public AnalyzeViewModel AnalyzeVm { get; }
     public DfsSimulationViewModel DfsSimulationVm { get; }
     public DashboardViewModel DashboardVm { get; }
@@ -54,7 +52,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private object _currentView;
     public object CurrentView { get => _currentView; set { _currentView = value; OnPropertyChanged(); } }
 
-    // Commands
     public RelayCommand LoadJsonCommand { get; }
     public RelayCommand AnalyzeCommand { get; }
 
@@ -80,18 +77,15 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         ArtifactsVm = new ArtifactsViewModel(AnalyzeVm);
         SettingsVm = new SettingsViewModel(this);
 
-        // Top bar commands map to Analyze
         LoadJsonCommand = AnalyzeVm.LoadJsonCommand;
         AnalyzeCommand = AnalyzeVm.AnalyzeCommand;
 
-        // Navigation
         NavigateDashboardCommand = new RelayCommand(() => CurrentView = DashboardVm);
         NavigateAnalyzeCommand = new RelayCommand(() => CurrentView = AnalyzeVm);
         NavigateDfsSimulationCommand = new RelayCommand(() => CurrentView = DfsSimulationVm);
         NavigateArtifactsCommand = new RelayCommand(() => CurrentView = ArtifactsVm);
         NavigateSettingsCommand = new RelayCommand(() => CurrentView = SettingsVm);
 
-        // Default view: Dashboard
         _currentView = DashboardVm;
     }
 

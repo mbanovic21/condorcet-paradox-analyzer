@@ -16,7 +16,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
     private readonly AnalyzeViewModel _analyze;
     private readonly DispatcherTimer _timer;
 
-    // Canvas size in logical units (used with Viewbox in View)
     public const double CanvasW = 860;
     public const double CanvasH = 560;
 
@@ -100,7 +99,7 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
         ResetCommand = new RelayCommand(() => Index = 0, () => HasTrace);
         PlayPauseCommand = new RelayCommand(() => TogglePlay(!IsPlaying), () => HasTrace);
 
-        LoadFromLastAnalysis(); // auto-load initially if any analysis already exists
+        LoadFromLastAnalysis();
     }
 
     private void TogglePlay(bool play)
@@ -137,7 +136,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
         Nodes.Clear();
         Edges.Clear();
 
-        // Candidates from last result matrix rows
         var candidates = _analyze.MatrixARows.Select(r => r["Row"].ToString()!)
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .Distinct()
@@ -149,8 +147,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
         if (candidates.Count == 0)
             return;
 
-        // Build normalized positions:
-        // Prefer backend layout; fallback to circle.
         var normPos = new Dictionary<string, (double x, double y)>();
         if (layout != null && layout.Count > 0)
         {
@@ -163,7 +159,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
 
         if (normPos.Count != candidates.Count)
         {
-            // fallback: circular layout
             var n = candidates.Count;
             for (int i = 0; i < n; i++)
             {
@@ -174,7 +169,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
             }
         }
 
-        // Convert normalized -> pixel coordinates with padding
         const double pad = 60.0;
         double minX = pad, maxX = CanvasW - pad;
         double minY = pad, maxY = CanvasH - pad;
@@ -188,14 +182,12 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
             px[c] = (x, y);
         }
 
-        // Nodes
         foreach (var c in candidates)
         {
             var (x, y) = px[c];
             Nodes.Add(new NodeVm(id: c, x: x, y: y));
         }
 
-        // Edges from MatrixARows (A matrix)
         const double nodeRadius = 28.0;
 
         if (_analyze.MatrixARows.Count > 0)
@@ -214,10 +206,8 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
                     var (x1, y1) = px[from];
                     var (x2, y2) = px[to];
 
-                    // Trim endpoints to avoid overlapping node circles
                     var (tx1, ty1, tx2, ty2) = TrimLine(x1, y1, x2, y2, nodeRadius);
 
-                    // Arrowhead points at end
                     var arrow = ArrowHead(tx1, ty1, tx2, ty2, headLen: 14, headWidth: 10);
 
                     var edge = new EdgeVm(from, to)
@@ -243,7 +233,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
 
     private void ApplyStep()
     {
-        // Reset visuals
         foreach (var n in Nodes)
         {
             n.State = "WHITE";
@@ -258,28 +247,24 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
         var step = CurrentStep;
         if (step == null) return;
 
-        // Colors
         foreach (var kv in step.Colors)
         {
             var node = Nodes.FirstOrDefault(n => n.Id == kv.Key);
             if (node != null) node.State = kv.Value;
         }
 
-        // Stack highlight
         foreach (var s in step.Stack)
         {
             var node = Nodes.FirstOrDefault(n => n.Id == s);
             if (node != null) node.IsInStack = true;
         }
 
-        // Active edge highlight
         if (!string.IsNullOrWhiteSpace(step.U) && !string.IsNullOrWhiteSpace(step.V))
         {
             var edge = Edges.FirstOrDefault(ed => ed.From == step.U && ed.To == step.V);
             if (edge != null) edge.IsActive = true;
         }
 
-        // Cycle edges
         if (step.Cycle != null && step.Cycle.Count >= 2)
         {
             for (int i = 0; i < step.Cycle.Count - 1; i++)
@@ -312,7 +297,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
         var ux = dx / dist;
         var uy = dy / dist;
 
-        // move start forward by r, end backward by r
         var tx1 = x1 + ux * r;
         var ty1 = y1 + uy * r;
         var tx2 = x2 - ux * r;
@@ -323,7 +307,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
 
     private static (double x3, double y3, double x4, double y4) ArrowHead(double x1, double y1, double x2, double y2, double headLen, double headWidth)
     {
-        // Arrow head at (x2,y2) pointing from (x1,y1)->(x2,y2)
         var dx = x2 - x1;
         var dy = y2 - y1;
         var dist = Math.Sqrt(dx * dx + dy * dy);
@@ -332,7 +315,6 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
         var ux = dx / dist;
         var uy = dy / dist;
 
-        // perpendicular
         var px = -uy;
         var py = ux;
 
@@ -355,8 +337,8 @@ public sealed class DfsSimulationViewModel : INotifyPropertyChanged
 public sealed class NodeVm : INotifyPropertyChanged
 {
     public string Id { get; }
-    public double X { get; } // px
-    public double Y { get; } // px
+    public double X { get; }
+    public double Y { get; }
 
     private string _state = "WHITE";
     public string State { get => _state; set { _state = value; OnPropertyChanged(); } }
@@ -386,7 +368,6 @@ public sealed class EdgeVm : INotifyPropertyChanged
     public double X2 { get; set; }
     public double Y2 { get; set; }
 
-    // Arrowhead triangle points: [ (X2,Y2), (x3,y3), (x4,y4) ]
     private PointCollection _arrowPoints = new();
     public PointCollection ArrowPoints
     {
