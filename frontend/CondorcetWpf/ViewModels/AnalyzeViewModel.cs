@@ -292,19 +292,17 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
     private void ApplyResultToUi(AnalysisResult result)
     {
-        if (!string.IsNullOrWhiteSpace(result.CondorcetWinner))
-            SummaryLine1 = $"Condorcet winner: {result.CondorcetWinner}";
-        else
-            SummaryLine1 = "No Condorcet winner.";
+        SummaryLine1 = !string.IsNullOrWhiteSpace(result.CondorcetWinner)
+            ? $"Condorcet winner: {result.CondorcetWinner}"
+            : "No Condorcet winner.";
 
         SummaryLine2 = result.CycleInfo.HasCycle
             ? "Condorcet paradox detected (directed cycle exists)."
             : "No directed cycle detected.";
 
-        if (result.CycleInfo.HasCycle && result.CycleInfo.Cycle is not null)
-            CycleText = "Cycle: " + string.Join(" → ", result.CycleInfo.Cycle);
-        else
-            CycleText = "";
+        CycleText = (result.CycleInfo.HasCycle && result.CycleInfo.Cycle is not null)
+            ? "Cycle: " + string.Join(" → ", result.CycleInfo.Cycle)
+            : "";
 
         WinnersRows.Clear();
         foreach (var kv in result.Winners.OrderBy(k => k.Key))
@@ -328,39 +326,53 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 
         var cands = result.Pairwise.Candidates;
 
+        MatrixARows.Clear();
+
         DataTable dtA = new DataTable();
-        dtA.Columns.Add("vs", typeof(string));
+        dtA.Columns.Add("Row", typeof(string));
         foreach (var c in cands) dtA.Columns.Add(c, typeof(int));
 
         for (int i = 0; i < cands.Count; i++)
         {
-            DataRow row = dtA.NewRow();
-            row[0] = cands[i];
+            var dictRow = new Dictionary<string, object> { ["Row"] = cands[i] };
+
+            DataRow dataRow = dtA.NewRow();
+            dataRow["Row"] = cands[i];
+
             for (int j = 0; j < cands.Count; j++)
             {
-                row[j + 1] = result.Pairwise.A[i][j];
+                var value = result.Pairwise.A[i][j];
+                dictRow[cands[j]] = value;
+                dataRow[cands[j]] = value;
             }
-            dtA.Rows.Add(row);
+
+            MatrixARows.Add(dictRow);
+            dtA.Rows.Add(dataRow);
         }
         MatrixAView = dtA.DefaultView;
 
         DataTable dtM = new DataTable();
-        dtM.Columns.Add("vs", typeof(string));
+        dtM.Columns.Add("Row", typeof(string));
         foreach (var c in cands) dtM.Columns.Add(c, typeof(int));
 
         for (int i = 0; i < cands.Count; i++)
         {
             DataRow row = dtM.NewRow();
-            row[0] = cands[i];
+            row["Row"] = cands[i];
             for (int j = 0; j < cands.Count; j++)
             {
-                row[j + 1] = result.Pairwise.Margin[i][j];
+                row[cands[j]] = result.Pairwise.Margin[i][j];
             }
             dtM.Rows.Add(row);
         }
         MatrixMarginView = dtM.DefaultView;
 
         GraphImage = DecodeBase64Png(result.GraphPngBase64);
+
+        LastDfsTrace = result.DfsTrace;
+        GraphLayout = result.GraphLayout;
+
+        OnPropertyChanged(nameof(HasInput));
     }
 
     private static BitmapImage? DecodeBase64Png(string? b64)

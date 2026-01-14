@@ -72,6 +72,16 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             notifyHasInputChanged: () => OnPropertyChanged(nameof(HasInput))
         );
 
+        AnalyzeVm.IncludeTrace = this.IncludeTrace;
+        AnalyzeVm.SaveArtifact = this.SaveArtifact;
+        AnalyzeVm.ArtifactTag = this.ArtifactTag;
+        AnalyzeVm.ArtifactNotes = this.ArtifactNotes;
+
+        DashboardVm = new DashboardViewModel(AnalyzeVm);
+        DfsSimulationVm = new DfsSimulationViewModel(AnalyzeVm);
+        ArtifactsVm = new ArtifactsViewModel(AnalyzeVm);
+        SettingsVm = new SettingsViewModel(this);
+
         DashboardVm = new DashboardViewModel(AnalyzeVm);
         DfsSimulationVm = new DfsSimulationViewModel(AnalyzeVm);
         ArtifactsVm = new ArtifactsViewModel(AnalyzeVm);

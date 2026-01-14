@@ -41,20 +41,18 @@
                     <Grid Width="860" Height="560">
                         <Canvas Width="860" Height="560">
 
-                            <!-- Edges -->
                             <ItemsControl ItemsSource="{Binding Edges}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Canvas>
+                                        <Grid>
                                             <Line X1="{Binding X1}" Y1="{Binding Y1}"
-                                                  X2="{Binding X2}" Y2="{Binding Y2}"
-                                                  StrokeThickness="2">
+                      X2="{Binding X2}" Y2="{Binding Y2}"
+                      StrokeThickness="2">
                                                 <Line.Style>
                                                     <Style TargetType="Line">
                                                         <Setter Property="Stroke" Value="#9CA3AF"/>
@@ -72,7 +70,6 @@
                                                 </Line.Style>
                                             </Line>
 
-                                            <!-- Arrowhead -->
                                             <Polygon Points="{Binding ArrowPoints}">
                                                 <Polygon.Style>
                                                     <Style TargetType="Polygon">
@@ -88,7 +85,7 @@
                                                     </Style>
                                                 </Polygon.Style>
                                             </Polygon>
-                                        </Canvas>
+                                        </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
