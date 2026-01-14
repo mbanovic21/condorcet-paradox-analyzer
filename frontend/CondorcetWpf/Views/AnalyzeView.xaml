@@ -160,6 +160,22 @@
                           AlternatingRowBackground="#F0F0F0"
                           GridLinesVisibility="All"/>
                     </TabItem>
+
+                    <TabItem Header="Ranked Pairs">
+                        <DataGrid ItemsSource="{Binding RankedPairsRows}" 
+                                  AutoGenerateColumns="False" 
+                                  CanUserAddRows="False" 
+                                  IsReadOnly="True" 
+                                  Margin="10">  
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Winner" Binding="{Binding Winner}" Width="*"/>
+                                <DataGridTextColumn Header=" " Binding="{Binding Arrow}" Width="Auto"/>
+                                <DataGridTextColumn Header="Loser" Binding="{Binding Loser}" Width="*"/>
+                                <DataGridTextColumn Header="Strength (N)" Binding="{Binding Strength}" Width="*"/>
+                                <DataGridTextColumn Header="Margin" Binding="{Binding Margin}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
                 </TabControl>
             </GroupBox>
         </Grid>

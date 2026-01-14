@@ -69,3 +69,18 @@ def compute_pairwise(input_data: ElectionInput) -> Tuple[
                 p[i][j] = max(p[i][j], min(p[i][k], p[k][j]))
 
     return N, A, margin, percent_matrix, p
+
+def compute_ranked_pairs_list(N, candidates):
+    m = len(candidates)
+    pairs = []
+    for i in range(m):
+        for j in range(m):
+            if i != j and N[i][j] > N[j][i]:
+                pairs.append({
+                    "winner": candidates[i],
+                    "loser": candidates[j],
+                    "strength": N[i][j],
+                    "margin": N[i][j] - N[j][i]
+                })
+    
+    return sorted(pairs, key=lambda x: (x['margin'], x['strength']), reverse=True)

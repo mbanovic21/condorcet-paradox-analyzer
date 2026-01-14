@@ -139,4 +139,22 @@ public sealed class AnalysisResult
 
     [JsonPropertyName("graph_layout")]
     public Dictionary<string, List<double>>? GraphLayout { get; set; }
+
+    [JsonPropertyName("ranked_pairs_summary")]
+    public List<RankedPair> RankedPairsSummary { get; set; } = new();
+}
+
+public sealed class RankedPair
+{
+    [JsonPropertyName("winner")]
+    public string Winner { get; set; } = "";
+
+    [JsonPropertyName("loser")]
+    public string Loser { get; set; } = "";
+
+    [JsonPropertyName("strength")]
+    public int Strength { get; set; }
+
+    [JsonPropertyName("margin")]
+    public int Margin { get; set; }
 }

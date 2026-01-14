@@ -163,6 +163,7 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
     public ObservableCollection<RowScore> PluralityRows { get; } = new();
     public ObservableCollection<RowScore> CopelandRows { get; } = new();
     public ObservableCollection<RowScore> MinimaxRows { get; } = new();
+    public ObservableCollection<RankedPairRow> RankedPairsRows { get; } = new();
 
     public ObservableCollection<Dictionary<string, object>> MatrixARows { get; } = new();
     public ObservableCollection<Dictionary<string, object>> MatrixMarginRows { get; } = new();
@@ -310,6 +311,7 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
         MinimaxRows.Clear();
         MatrixARows.Clear();
         MatrixMarginRows.Clear();
+        RankedPairsRows.Clear();
     }
 
     private void ApplyResultToUi(AnalysisResult result)
@@ -379,10 +381,20 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
         if (result.Pairwise.SchulzePaths != null && result.Pairwise.SchulzePaths.Count > 0)
             MatrixSchulzeView = CreateDataTable(cands, result.Pairwise.SchulzePaths)?.DefaultView;
 
+        RankedPairsRows.Clear();
+        if (result.RankedPairsSummary != null)
+        {
+            foreach (var p in result.RankedPairsSummary)
+            {
+                RankedPairsRows.Add(new RankedPairRow(p.Winner, p.Loser, p.Strength, p.Margin));
+            }
+        }
+
         GraphImage = DecodeBase64Png(result.GraphPngBase64);
         GraphLayout = result.GraphLayout;
         LastDfsTrace = result.DfsTrace;
 
+        OnPropertyChanged(nameof(RankedPairsRows));
         OnPropertyChanged(nameof(HasInput));
     }
 
@@ -465,3 +477,8 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
 public sealed record RowKV(string Method, string Winner);
 public sealed record RowScore(string Candidate, int Score);
 public sealed record TraceRow(int Index, string Action, string U, string V, string Message, string Stack);
+
+public sealed record RankedPairRow(string Winner, string Loser, int Strength, int Margin)
+{
+    public string Arrow => "→";
+}

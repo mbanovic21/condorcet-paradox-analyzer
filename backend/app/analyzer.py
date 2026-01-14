@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .models import ElectionInput, AnalysisResult, PairwiseResult, MethodScores, CycleResult
+from .models import ElectionInput, AnalysisResult, PairwiseResult, MethodScores, CycleResult, RankedPair
 from .pairwise import compute_pairwise
 from .graph_algorithms import dfs_with_trace, find_condorcet_winner, dfs_find_cycle
 from .methods import (
@@ -47,6 +47,21 @@ def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> 
     graph_png_b64 = render_graph_png_base64(input_data.candidates, A, margin, cycle)
     layout = compute_layout_normalized(input_data.candidates, A)
 
+    ranked_summary = []
+    C = input_data.candidates
+    m = len(C)
+    for i in range(m):
+        for j in range(m):
+            if i != j and N[i][j] > N[j][i]:
+                ranked_summary.append(RankedPair(
+                    winner=C[i],
+                    loser=C[j],
+                    strength=N[i][j],
+                    margin=N[i][j] - N[j][i]
+                ))
+    
+    ranked_summary.sort(key=lambda x: (x.margin, x.strength), reverse=True)
+
     return AnalysisResult(
         candidates=input_data.candidates,
         pairwise=PairwiseResult(candidates=input_data.candidates, N=N, A=A, margin=margin, percent=percents, schulze_paths=schulze),
@@ -57,4 +72,5 @@ def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> 
         graph_png_base64=graph_png_b64,
         dfs_trace=dfs_trace,
         graph_layout=layout,
+        ranked_pairs_summary=ranked_summary
     )

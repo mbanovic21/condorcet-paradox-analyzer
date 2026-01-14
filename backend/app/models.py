@@ -82,3 +82,10 @@ class AnalysisResult(BaseModel):
     artifact_run_id: Optional[str] = None
     dfs_trace: Optional[DfsTrace] = None
     graph_layout: Optional[Dict[str, List[float]]] = None
+    ranked_pairs_summary: List[RankedPair] = []
+
+class RankedPair(BaseModel):
+    winner: str
+    loser: str
+    strength: int
+    margin: int
