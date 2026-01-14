@@ -31,6 +31,8 @@ class PairwiseResult(BaseModel):
     N: List[List[int]]
     A: List[List[int]] 
     margin: List[List[int]]
+    percent: List[List[float]]
+    schulze_paths: List[List[int]]
 
 class MethodScores(BaseModel):
     borda: Dict[str, int]

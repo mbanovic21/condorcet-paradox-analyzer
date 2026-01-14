@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-
 def copeland_scores(candidates: List[str], margin: List[List[int]]) -> Dict[str, int]:
     """
     Copeland score: wins - losses in pairwise duels (ties count as 0).

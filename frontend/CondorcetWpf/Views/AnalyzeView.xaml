@@ -120,11 +120,45 @@
                             </DataGrid>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="A (wins)">
-                        <DataGrid ItemsSource="{Binding MatrixAView}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                    <TabItem Header="Votes">
+                        <DataGrid ItemsSource="{Binding MatrixVotesView}" 
+                          IsReadOnly="True" 
+                          AutoGenerateColumns="True"
+                          AlternatingRowBackground="#F0F0F0"
+                          GridLinesVisibility="All"
+                          VerticalScrollBarVisibility="Auto"/>
                     </TabItem>
+
+                    <TabItem Header="A (wins)">
+                        <DataGrid ItemsSource="{Binding MatrixAView}" 
+                          IsReadOnly="True" 
+                          AutoGenerateColumns="True"
+                          AlternatingRowBackground="#F0F0F0"
+                          GridLinesVisibility="All"/>
+                    </TabItem>
+
                     <TabItem Header="Margin">
-                        <DataGrid ItemsSource="{Binding MatrixMarginView}" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"/>
+                        <DataGrid ItemsSource="{Binding MatrixMarginView}" 
+                          IsReadOnly="True" 
+                          AutoGenerateColumns="True"
+                          AlternatingRowBackground="#F0F0F0"
+                          GridLinesVisibility="All"/>
+                    </TabItem>
+
+                    <TabItem Header="Schulze (Paths)">
+                        <DataGrid ItemsSource="{Binding MatrixSchulzeView}" 
+                          IsReadOnly="True" 
+                          AutoGenerateColumns="True"
+                          AlternatingRowBackground="#F0F0F0"
+                          GridLinesVisibility="All"/>
+                    </TabItem>
+
+                    <TabItem Header="Percent">
+                        <DataGrid ItemsSource="{Binding MatrixPercentView}" 
+                          IsReadOnly="True" 
+                          AutoGenerateColumns="True"
+                          AlternatingRowBackground="#F0F0F0"
+                          GridLinesVisibility="All"/>
                     </TabItem>
                 </TabControl>
             </GroupBox>

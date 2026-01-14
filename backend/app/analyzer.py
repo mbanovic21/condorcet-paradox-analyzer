@@ -14,7 +14,7 @@ from .rendering import render_graph_png_base64, compute_layout_normalized
 
 
 def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> AnalysisResult:
-    N, A, margin = compute_pairwise(input_data)
+    N, A, margin, percents, schulze = compute_pairwise(input_data)
 
     condorcet = find_condorcet_winner(input_data.candidates, A)
 
@@ -49,7 +49,7 @@ def analyze_election(input_data: ElectionInput, include_trace: bool = False) -> 
 
     return AnalysisResult(
         candidates=input_data.candidates,
-        pairwise=PairwiseResult(candidates=input_data.candidates, N=N, A=A, margin=margin),
+        pairwise=PairwiseResult(candidates=input_data.candidates, N=N, A=A, margin=margin, percent=percents, schulze_paths=schulze),
         condorcet_winner=condorcet,
         cycle_info=CycleResult(has_cycle=(cycle is not None), cycle=cycle),
         scores=scores,

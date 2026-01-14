@@ -13,7 +13,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private string _status = "Load a JSON file, then click Analyze (backend must be running).";
     public string Status { get => _status; set { _status = value; OnPropertyChanged(); } }
 
-    private bool _saveArtifact;
+    private bool _saveArtifact = true;
     public bool SaveArtifact
     {
         get => _saveArtifact;

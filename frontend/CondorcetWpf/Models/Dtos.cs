@@ -26,14 +26,20 @@ public sealed class PairwiseResult
     [JsonPropertyName("candidates")]
     public List<string> Candidates { get; set; } = new();
 
-    [JsonPropertyName("N")]
-    public List<List<int>> N { get; set; } = new();
-
     [JsonPropertyName("A")]
     public List<List<int>> A { get; set; } = new();
 
     [JsonPropertyName("margin")]
     public List<List<int>> Margin { get; set; } = new();
+
+    [JsonPropertyName("N")]
+    public List<List<int>> Votes { get; set; } = new();
+
+    [JsonPropertyName("schulze_paths")]
+    public List<List<double>> SchulzePaths { get; set; } = new();
+
+    [JsonPropertyName("percent")]
+    public List<List<double>> Percent { get; set; } = new();
 }
 
 public sealed class CycleResult

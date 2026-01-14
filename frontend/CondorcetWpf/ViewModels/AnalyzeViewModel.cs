@@ -183,6 +183,28 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
         set { _matrixMarginView = value; OnPropertyChanged(); }
     }
 
+
+    private DataView? _matrixVotesView;
+    public DataView? MatrixVotesView
+    {
+        get => _matrixVotesView;
+        set { _matrixVotesView = value; OnPropertyChanged(); }
+    }
+
+    private DataView? _matrixPercentView;
+    public DataView? MatrixPercentView
+    {
+        get => _matrixPercentView;
+        set { _matrixPercentView = value; OnPropertyChanged(); }
+    }
+
+    private DataView? _matrixSchulzeView;
+    public DataView? MatrixSchulzeView
+    {
+        get => _matrixSchulzeView;
+        set { _matrixSchulzeView = value; OnPropertyChanged(); }
+    }
+
     private void LoadJson()
     {
         var dlg = new OpenFileDialog
@@ -297,37 +319,36 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
             : "No Condorcet winner.";
 
         SummaryLine2 = result.CycleInfo.HasCycle
-            ? "Condorcet paradox detected (directed cycle exists)."
+            ? "Condorcet paradox detected!"
             : "No directed cycle detected.";
 
-        CycleText = (result.CycleInfo.HasCycle && result.CycleInfo.Cycle is not null)
+        CycleText = result.CycleInfo.Cycle != null
             ? "Cycle: " + string.Join(" → ", result.CycleInfo.Cycle)
             : "";
 
         WinnersRows.Clear();
         foreach (var kv in result.Winners.OrderBy(k => k.Key))
-            WinnersRows.Add(new RowKV(kv.Key, kv.Value ?? "(tie/none)"));
+            WinnersRows.Add(new RowKV(kv.Key, kv.Value ?? "(none)"));
 
         BordaRows.Clear();
         foreach (var kv in result.Scores.Borda.OrderByDescending(k => k.Value))
-            BordaRows.Add(new RowScore(kv.Key, kv.Value));
+            BordaRows.Add(new RowScore(kv.Key, (int)kv.Value));
 
         PluralityRows.Clear();
         foreach (var kv in result.Scores.Plurality.OrderByDescending(k => k.Value))
-            PluralityRows.Add(new RowScore(kv.Key, kv.Value));
+            PluralityRows.Add(new RowScore(kv.Key, (int)kv.Value));
 
         CopelandRows.Clear();
         foreach (var kv in result.Scores.Copeland.OrderByDescending(k => k.Value))
-            CopelandRows.Add(new RowScore(kv.Key, kv.Value));
+            CopelandRows.Add(new RowScore(kv.Key, (int)kv.Value));
 
         MinimaxRows.Clear();
         foreach (var kv in result.Scores.Minimax.OrderByDescending(k => k.Value))
-            MinimaxRows.Add(new RowScore(kv.Key, kv.Value));
+            MinimaxRows.Add(new RowScore(kv.Key, (int)kv.Value));
 
         var cands = result.Pairwise.Candidates;
 
         MatrixARows.Clear();
-
         DataTable dtA = new DataTable();
         dtA.Columns.Add("Row", typeof(string));
         foreach (var c in cands) dtA.Columns.Add(c, typeof(int));
@@ -335,44 +356,90 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
         for (int i = 0; i < cands.Count; i++)
         {
             var dictRow = new Dictionary<string, object> { ["Row"] = cands[i] };
-
             DataRow dataRow = dtA.NewRow();
             dataRow["Row"] = cands[i];
-
             for (int j = 0; j < cands.Count; j++)
             {
                 var value = result.Pairwise.A[i][j];
                 dictRow[cands[j]] = value;
-                dataRow[cands[j]] = value;
+                dataRow[cands[j]] = (int)value;
             }
-
             MatrixARows.Add(dictRow);
             dtA.Rows.Add(dataRow);
         }
         MatrixAView = dtA.DefaultView;
 
-        DataTable dtM = new DataTable();
-        dtM.Columns.Add("Row", typeof(string));
-        foreach (var c in cands) dtM.Columns.Add(c, typeof(int));
+        MatrixMarginView = CreateDataTable(cands, result.Pairwise.Margin)?.DefaultView;
 
-        for (int i = 0; i < cands.Count; i++)
-        {
-            DataRow row = dtM.NewRow();
-            row["Row"] = cands[i];
-            for (int j = 0; j < cands.Count; j++)
-            {
-                row[cands[j]] = result.Pairwise.Margin[i][j];
-            }
-            dtM.Rows.Add(row);
-        }
-        MatrixMarginView = dtM.DefaultView;
+        MatrixVotesView = CreateDataTable(cands, result.Pairwise.Votes)?.DefaultView;
+
+        if (result.Pairwise.Percent != null && result.Pairwise.Percent.Count > 0)
+            MatrixPercentView = CreateDataTable(cands, result.Pairwise.Percent, true)?.DefaultView;
+
+        if (result.Pairwise.SchulzePaths != null && result.Pairwise.SchulzePaths.Count > 0)
+            MatrixSchulzeView = CreateDataTable(cands, result.Pairwise.SchulzePaths)?.DefaultView;
 
         GraphImage = DecodeBase64Png(result.GraphPngBase64);
-
-        LastDfsTrace = result.DfsTrace;
         GraphLayout = result.GraphLayout;
+        LastDfsTrace = result.DfsTrace;
 
         OnPropertyChanged(nameof(HasInput));
+    }
+
+    private DataTable? CreateDataTable(List<string> candidates, List<List<double>> data, bool isPercent = false)
+    {
+        if (data == null || data.Count == 0) return null;
+
+        DataTable dt = new DataTable();
+        dt.Columns.Add("Row", typeof(string));
+
+        foreach (var c in candidates)
+            dt.Columns.Add(c, isPercent ? typeof(string) : typeof(object));
+
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            DataRow row = dt.NewRow();
+            row["Row"] = candidates[i];
+            for (int j = 0; j < candidates.Count; j++)
+            {
+                if (i < data.Count && j < data[i].Count)
+                {
+                    double val = data[i][j];
+                    if (isPercent)
+                        row[candidates[j]] = (val / 100.0).ToString("P1");
+                    else
+                        row[candidates[j]] = (val % 1 == 0) ? (int)val : val;
+                }
+            }
+            dt.Rows.Add(row);
+        }
+        return dt;
+    }
+
+    private DataTable? CreateDataTable(List<string> candidates, List<List<int>> data)
+    {
+        if (data == null || data.Count == 0) return null;
+
+        DataTable dt = new DataTable();
+        dt.Columns.Add("Row", typeof(string));
+
+        foreach (var c in candidates)
+            dt.Columns.Add(c, typeof(int));
+
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            DataRow row = dt.NewRow();
+            row["Row"] = candidates[i];
+            for (int j = 0; j < candidates.Count; j++)
+            {
+                if (i < data.Count && j < data[i].Count)
+                {
+                    row[candidates[j]] = data[i][j];
+                }
+            }
+            dt.Rows.Add(row);
+        }
+        return dt;
     }
 
     private static BitmapImage? DecodeBase64Png(string? b64)
