@@ -33,7 +33,6 @@
             </Setter>
         </Style>
 
-        <!-- VM -> View mapping -->
         <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
             <views:DashboardView />
         </DataTemplate>

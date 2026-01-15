@@ -9,7 +9,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Controls -->
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <Button Content="Load last trace" Width="130" Margin="0,0,10,0"
                     Command="{Binding LoadFromLastAnalysisCommand}"/>
@@ -22,20 +21,29 @@
             <Button Content="{Binding PlayPauseText}" Width="90" Margin="0,0,16,0"
                     Command="{Binding PlayPauseCommand}"/>
 
-            <TextBlock Text="Speed (ms):" VerticalAlignment="Center"/>
-            <Slider Minimum="50" Maximum="1200" Value="{Binding SpeedMs}" Width="160" Margin="10,0,0,0"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock Text="-" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#6B7280"/>
+                <Slider Minimum="50" 
+                        Maximum="1200" 
+                        Value="{Binding SpeedMs}" 
+                        IsDirectionReversed="True"
+                        Width="160" 
+                        Margin="5,0,5,0"
+                        TickPlacement="BottomRight" 
+                        TickFrequency="100"/>   
+                <TextBlock Text="+" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#6B7280"/>
+            </StackPanel>
 
             <TextBlock Text="{Binding Header}" VerticalAlignment="Center" Margin="16,0,0,0" Foreground="#374151"/>
         </DockPanel>
 
-        <!-- Main -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2.2*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Graph -->
             <Border Grid.Column="0" Background="#F9FAFB" CornerRadius="10" Padding="10" Margin="0,0,12,0">
                 <Viewbox Stretch="Uniform">
                     <Grid Width="860" Height="560">
@@ -90,7 +98,6 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- Nodes -->
                             <ItemsControl ItemsSource="{Binding Nodes}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -100,7 +107,6 @@
 
                                 <ItemsControl.ItemContainerStyle>
                                     <Style TargetType="ContentPresenter">
-                                        <!-- Center the node: Left/Top are top-left; node is 56x56 so subtract 28 -->
                                         <Setter Property="Canvas.Left" Value="{Binding X}"/>
                                         <Setter Property="Canvas.Top" Value="{Binding Y}"/>
                                         <Setter Property="RenderTransform">
@@ -153,7 +159,6 @@
                 </Viewbox>
             </Border>
 
-            <!-- State panel -->
             <Border Grid.Column="1" Background="#F9FAFB" CornerRadius="10" Padding="12">
                 <StackPanel>
                     <TextBlock Text="DFS State" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
