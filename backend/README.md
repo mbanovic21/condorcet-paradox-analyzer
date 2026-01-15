@@ -23,3 +23,6 @@ curl -X POST http://127.0.0.1:8000/election/analyze \
   -H "Content-Type: application/json" \
   --data-binary @example_input.json
 ```
+
+
+v2: returns pairwise margin matrix + Copeland and Minimax scores.

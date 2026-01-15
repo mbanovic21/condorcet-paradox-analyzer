@@ -1,0 +1,18 @@
+{
+  "candidates": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "ballots": [
+    {
+      "ranking": [
+        "A",
+        "B",
+        "C"
+      ],
+      "count": 3
+    }
+  ]
+}

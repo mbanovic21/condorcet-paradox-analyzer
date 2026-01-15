@@ -1,0 +1,22 @@
+{
+  "candidates": ["A", "B", "C", "D", "E", "F", "G"],
+  "ballots": [
+    { "ranking": ["A", "B", "C", "D", "E", "F", "G"], "count": 40 },
+    { "ranking": ["A", "B", "C", "E", "D", "F", "G"], "count": 32 },
+    { "ranking": ["A", "C", "B", "D", "E", "F", "G"], "count": 28 },
+
+    { "ranking": ["B", "C", "D", "E", "F", "A", "G"], "count": 26 },
+    { "ranking": ["B", "C", "E", "D", "F", "A", "G"], "count": 22 },
+
+    { "ranking": ["C", "D", "E", "F", "A", "B", "G"], "count": 20 },
+    { "ranking": ["C", "E", "D", "F", "A", "B", "G"], "count": 18 },
+
+    { "ranking": ["D", "E", "F", "A", "B", "C", "G"], "count": 16 },
+    { "ranking": ["D", "F", "E", "A", "B", "C", "G"], "count": 14 },
+
+    { "ranking": ["E", "F", "A", "B", "C", "D", "G"], "count": 12 },
+    { "ranking": ["F", "A", "B", "C", "D", "E", "G"], "count": 10 },
+
+    { "ranking": ["G", "A", "B", "C", "D", "E", "F"], "count": 8 }
+  ]
+}

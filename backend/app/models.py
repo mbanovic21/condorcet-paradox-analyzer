@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Literal
 
 class Ballot(BaseModel):
     ranking: List[str] = Field(..., description="Strict ranking of candidates, best to worst")
@@ -28,16 +28,48 @@ class ElectionInput(BaseModel):
 
 class PairwiseResult(BaseModel):
     candidates: List[str]
-    N: List[List[int]]  # N[i][j] = voters pref i over j
-    A: List[List[int]]  # A[i][j] = 1 if i beats j, else 0 (ties => 0)
+    N: List[List[int]]
+    A: List[List[int]] 
+    margin: List[List[int]]
+    percent: List[List[float]]
+    schulze_paths: List[List[int]]
 
 class MethodScores(BaseModel):
     borda: Dict[str, int]
     plurality: Dict[str, int]
+    copeland: Dict[str, int]
+    minimax: Dict[str, int]
 
 class CycleResult(BaseModel):
     has_cycle: bool
-    cycle: Optional[List[str]] = None  # e.g. ["A","B","C","A"]
+    cycle: Optional[List[str]] = None
+
+class DfsStep(BaseModel):
+    index: int
+    action: Literal[
+        "START",
+        "ENTER",
+        "EDGE",
+        "TREE_EDGE",
+        "BACK_EDGE",
+        "EXIT",
+        "FOUND_CYCLE",
+        "END",
+    ]
+    u: Optional[str] = None
+    v: Optional[str] = None
+
+    stack: List[str] = Field(default_factory=list) 
+    colors: Dict[str, str] = Field(default_factory=dict) 
+    parent: Dict[str, Optional[str]] = Field(default_factory=dict)
+
+    message: Optional[str] = None
+    cycle: Optional[List[str]] = None
+
+class DfsTrace(BaseModel):
+    steps: List[DfsStep] = Field(default_factory=list)
+    has_cycle: bool = False
+    cycle: Optional[List[str]] = None
 
 class AnalysisResult(BaseModel):
     candidates: List[str]
@@ -45,5 +77,15 @@ class AnalysisResult(BaseModel):
     condorcet_winner: Optional[str] = None
     cycle_info: CycleResult
     scores: MethodScores
-    winners: Dict[str, Optional[str]]  # method -> winner
+    winners: Dict[str, Optional[str]]
     graph_png_base64: Optional[str] = None
+    artifact_run_id: Optional[str] = None
+    dfs_trace: Optional[DfsTrace] = None
+    graph_layout: Optional[Dict[str, List[float]]] = None
+    ranked_pairs_summary: List[RankedPair] = []
+
+class RankedPair(BaseModel):
+    winner: str
+    loser: str
+    strength: int
+    margin: int
