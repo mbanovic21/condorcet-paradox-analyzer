@@ -254,6 +254,7 @@ public sealed class AnalyzeViewModel : INotifyPropertyChanged
                 notes: ArtifactNotes ?? "",
                 includeTrace: IncludeTrace
             );
+            if(_result is null) return;
 
             GraphLayout = _result.GraphLayout;
             LastDfsTrace = _result.DfsTrace;

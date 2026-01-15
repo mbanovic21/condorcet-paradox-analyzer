@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import ElectionInput, AnalysisResult
@@ -5,10 +6,9 @@ from app.analyzer import analyze_election
 
 app = FastAPI(title="Condorcet Analyzer", version="0.1.0")
 
-# Allow WPF dev-time access (localhost). Tighten for production.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "http://localhost:3000", "http://127.0.0.1", "http://127.0.0.1:8000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,3 +35,19 @@ def election_analyze(
 
     return result
 
+if __name__ == "__main__":
+    import uvicorn
+    import sys
+    import os
+
+    if sys.stdout is None:
+        sys.stdout = open(os.devnull, "w")
+    if sys.stderr is None:
+        sys.stderr = open(os.devnull, "w")
+
+    uvicorn.run(
+        app, 
+        host="127.0.0.1", 
+        port=8000, 
+        log_config=None
+    )

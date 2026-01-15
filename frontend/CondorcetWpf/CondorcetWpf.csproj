@@ -4,5 +4,9 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>ikona_condorcet.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="ikona_condorcet.ico" />
+  </ItemGroup>
 </Project>

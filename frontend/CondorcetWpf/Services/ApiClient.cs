@@ -19,37 +19,44 @@ public sealed class ApiClient
         };
     }
 
-    public async Task<AnalysisResult> AnalyzeAsync(
-    ElectionInput input,
-    bool saveArtifact = false,
-    string tag = "run",
-    string notes = "",
-    bool includeTrace = false
-)
+    public async Task<AnalysisResult?> AnalyzeAsync(
+        ElectionInput input,
+        bool saveArtifact = false,
+        string tag = "run",
+        string notes = "",
+        bool includeTrace = false
+    )
     {
-        var query = new List<string>();
-
-        if (saveArtifact)
+        try
         {
-            query.Add("save_artifact=true");
-            query.Add($"tag={Uri.EscapeDataString(tag ?? "run")}");
-            query.Add($"notes={Uri.EscapeDataString(notes ?? "")}");
-        }
+            var query = new List<string>();
+            if (saveArtifact)
+            {
+                query.Add("save_artifact=true");
+                query.Add($"tag={Uri.EscapeDataString(tag ?? "run")}");
+                query.Add($"notes={Uri.EscapeDataString(notes ?? "")}");
+            }
+            if (includeTrace) query.Add($"include_trace=true");
 
-        if (includeTrace)
+            var url = "/election/analyze";
+            if (query.Count > 0) url += "?" + string.Join("&", query);
+
+            var resp = await _http.PostAsJsonAsync(url, input);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await resp.Content.ReadFromJsonAsync<AnalysisResult>();
+        }
+        catch (HttpRequestException)
         {
-            query.Add($"include_trace=true");
+            return null;
         }
-
-        var url = "/election/analyze";
-        if (query.Count > 0)
-            url += "?" + string.Join("&", query);
-
-        var resp = await _http.PostAsJsonAsync(url, input);
-        resp.EnsureSuccessStatusCode();
-
-        var result = await resp.Content.ReadFromJsonAsync<AnalysisResult>();
-        if (result is null) throw new InvalidOperationException("Empty response from server.");
-        return result;
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }
