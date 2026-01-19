@@ -7,7 +7,6 @@
   <Application.Styles>
     <FluentTheme />
 
-    <!-- NAV button style (WPF NavButtonStyle ekvivalent) -->
     <Style Selector="Button.NavButton">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="Foreground" Value="White"/>
@@ -29,27 +28,29 @@
     </Style>
   </Application.Styles>
 
-  <!-- View mapping (VM -> View) -->
+  <!-- VM -> View mapping (OVO MORA OVAKO) -->
   <Application.DataTemplates>
-    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
-      <views:DashboardView />
+
+    <DataTemplate DataType="vm:DashboardViewModel">
+      <views:DashboardView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:AnalyzeViewModel}">
-      <views:AnalyzeView />
+    <DataTemplate DataType="vm:AnalyzeViewModel">
+      <views:AnalyzeView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:DfsSimulationViewModel}">
-      <views:DfsSimulationView />
+    <DataTemplate DataType="vm:DfsSimulationViewModel">
+      <views:DfsSimulationView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:ArtifactsViewModel}">
-      <views:ArtifactsView />
+    <DataTemplate DataType="vm:ArtifactsViewModel">
+      <views:ArtifactsView/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-      <views:SettingsView />
+    <DataTemplate DataType="vm:SettingsViewModel">
+      <views:SettingsView/>
     </DataTemplate>
+
   </Application.DataTemplates>
 
 </Application>

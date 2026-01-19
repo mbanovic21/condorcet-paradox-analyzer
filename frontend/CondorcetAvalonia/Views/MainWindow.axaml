@@ -1,19 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:CondorcetAvalonia.ViewModels"
-        xmlns:views="clr-namespace:CondorcetAvalonia.Views"
         x:Class="CondorcetAvalonia.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Condorcet Analyzer"
         Width="1200"
         Height="820"
         WindowStartupLocation="CenterScreen">
-
-  <Window.DataTemplates>
-    <DataTemplate DataType="{x:Type vm:AnalyzeViewModel}">
-      <views:AnalyzeView/>
-    </DataTemplate>
-  </Window.DataTemplates>
 
   <Grid Background="#F4F6F8">
     <Grid.ColumnDefinitions>
@@ -88,7 +81,6 @@
             <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
 
-          <!-- Controls: WRAP so it works on small widths -->
           <WrapPanel Grid.Row="0" Orientation="Horizontal">
             <Button Content="Load JSON..." Width="120" Margin="0,0,10,10" Command="{Binding LoadJsonCommand}"/>
             <Button Content="Analyze" Width="100" Margin="0,0,10,10" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding HasInput}"/>
@@ -110,7 +102,6 @@
             <TextBox Text="{Binding ArtifactNotes}" Width="240" Margin="0,0,10,10"/>
           </WrapPanel>
 
-          <!-- Status always visible as its own row -->
           <Border Grid.Row="1"
                   Background="White"
                   BorderBrush="#E5E7EB"
@@ -124,7 +115,6 @@
           </Border>
         </Grid>
       </Border>
-
 
       <!-- Content presenter -->
       <Border Grid.Row="1" Background="White" CornerRadius="10" Padding="14">
