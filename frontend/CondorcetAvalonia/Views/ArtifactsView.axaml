@@ -1,5 +1,41 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="CondorcetAvalonia.Views.ArtifactsView">
-  <TextBlock Text="Artifacts (stub)" FontSize="18"/>
+<UserControl
+    x:Class="CondorcetAvalonia.Views.ArtifactsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:CondorcetAvalonia.ViewModels"
+    x:DataType="vm:ArtifactsViewModel">
+
+  <Grid>
+    <StackPanel>
+      <TextBlock Text="Artifacts"
+                 FontSize="22"
+                 FontWeight="SemiBold"
+                 Margin="0,0,0,14"/>
+
+      <Border Background="#F9FAFB" CornerRadius="10" Padding="14">
+        <StackPanel>
+          <TextBlock Text="Last artifact run id:" FontWeight="SemiBold"/>
+          <TextBlock Text="{Binding LastRunId}"
+                     Margin="0,6,0,0"
+                     Foreground="#374151"/>
+
+          <Button Content="Copy run id"
+                  Width="140"
+                  Margin="0,12,0,0"
+                  Command="{Binding CopyRunIdCommand}"
+                  IsEnabled="{Binding HasRunId}"/>
+
+          <TextBlock Text="{Binding CopyStatus}"
+                     Margin="0,8,0,0"
+                     Foreground="#6B7280"
+                     TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Text="Note: Later, this page will list runs and AI worker outputs (explain/report/scenarios)."
+                 Margin="0,12,0,0"
+                 Foreground="#6B7280"
+                 TextWrapping="Wrap"/>
+    </StackPanel>
+  </Grid>
 </UserControl>
