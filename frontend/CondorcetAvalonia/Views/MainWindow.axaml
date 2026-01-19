@@ -1,12 +1,19 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:CondorcetAvalonia.ViewModels"
+        xmlns:views="clr-namespace:CondorcetAvalonia.Views"
         x:Class="CondorcetAvalonia.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Condorcet Analyzer"
         Width="1200"
         Height="820"
         WindowStartupLocation="CenterScreen">
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="{x:Type vm:AnalyzeViewModel}">
+      <views:AnalyzeView/>
+    </DataTemplate>
+  </Window.DataTemplates>
 
   <Grid Background="#F4F6F8">
     <Grid.ColumnDefinitions>

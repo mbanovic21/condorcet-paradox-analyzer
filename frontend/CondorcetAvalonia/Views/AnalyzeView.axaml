@@ -4,11 +4,7 @@
              x:Class="CondorcetAvalonia.Views.AnalyzeView"
              x:DataType="vm:AnalyzeViewModel">
 
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="2*"/>
-      <ColumnDefinition Width="3*"/>
-    </Grid.ColumnDefinitions>
+  <Grid ColumnDefinitions="2*,3*">
 
     <!-- LEFT -->
     <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,12,0">
@@ -16,11 +12,11 @@
 
         <!-- Summary -->
         <Border Background="#EEF2FF"
-        BorderBrush="#C7D2FE"
-        BorderThickness="1"
-        CornerRadius="10"
-        Padding="12"
-        Margin="0,0,0,12">
+                BorderBrush="#C7D2FE"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="12"
+                Margin="0,0,0,12">
           <StackPanel>
             <TextBlock Text="Summary" FontWeight="SemiBold" Margin="0,0,0,8"/>
             <TextBlock Text="{Binding SummaryLine1}" FontSize="16" FontWeight="SemiBold"/>
@@ -36,7 +32,6 @@
         <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
           <StackPanel>
             <TextBlock Text="Winners" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
             <DataGrid ItemsSource="{Binding WinnersRows}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -53,7 +48,6 @@
         <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
           <StackPanel>
             <TextBlock Text="Scores (Borda)" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
             <DataGrid ItemsSource="{Binding BordaRows}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -70,7 +64,6 @@
         <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
           <StackPanel>
             <TextBlock Text="Scores (Plurality)" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
             <DataGrid ItemsSource="{Binding PluralityRows}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -87,7 +80,6 @@
         <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
           <StackPanel>
             <TextBlock Text="Scores (Copeland)" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
             <DataGrid ItemsSource="{Binding CopelandRows}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -104,7 +96,6 @@
         <Border Background="#F9FAFB" CornerRadius="10" Padding="12">
           <StackPanel>
             <TextBlock Text="Scores (Minimax / Simpson)" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
             <DataGrid ItemsSource="{Binding MinimaxRows}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -121,11 +112,7 @@
     </ScrollViewer>
 
     <!-- RIGHT -->
-    <Grid Grid.Column="1">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="2*"/>
-        <RowDefinition Height="3*"/>
-      </Grid.RowDefinitions>
+    <Grid Grid.Column="1" RowDefinitions="2*,3*">
 
       <!-- Graph -->
       <Border Grid.Row="0" Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
@@ -143,14 +130,9 @@
           <TextBlock Text="Pairwise Matrices" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
           <TabControl>
-            <TabItem Header="DFS Simulation">
-              <Grid Margin="8">
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="Auto"/>
-                  <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
 
+            <TabItem Header="DFS Simulation">
+              <Grid Margin="8" RowDefinitions="Auto,Auto,*">
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8" Spacing="8">
                   <Button Content="⟵ Prev" Width="90" Command="{Binding TracePrevCommand}"/>
                   <Button Content="Next ⟶" Width="90" Command="{Binding TraceNextCommand}"/>
@@ -182,6 +164,12 @@
               </Grid>
             </TabItem>
 
+            <TabItem Header="Votes">
+              <DataGrid ItemsSource="{Binding MatrixVotesRows}"
+                        AutoGenerateColumns="True"
+                        IsReadOnly="True"/>
+            </TabItem>
+
             <TabItem Header="A (wins)">
               <DataGrid ItemsSource="{Binding MatrixARows}"
                         AutoGenerateColumns="True"
@@ -193,10 +181,37 @@
                         AutoGenerateColumns="True"
                         IsReadOnly="True"/>
             </TabItem>
+
+            <TabItem Header="Schulze (Paths)">
+              <DataGrid ItemsSource="{Binding MatrixSchulzeRows}"
+                        AutoGenerateColumns="True"
+                        IsReadOnly="True"/>
+            </TabItem>
+
+            <TabItem Header="Percent">
+              <DataGrid ItemsSource="{Binding MatrixPercentRows}"
+                        AutoGenerateColumns="True"
+                        IsReadOnly="True"/>
+            </TabItem>
+
+            <TabItem Header="Ranked Pairs">
+              <DataGrid ItemsSource="{Binding RankedPairsRows}"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Winner" Binding="{Binding Winner}" Width="*"/>
+                  <DataGridTextColumn Header=" " Binding="{Binding Arrow}" Width="Auto"/>
+                  <DataGridTextColumn Header="Loser" Binding="{Binding Loser}" Width="*"/>
+                  <DataGridTextColumn Header="Strength (N)" Binding="{Binding Strength}" Width="*"/>
+                  <DataGridTextColumn Header="Margin" Binding="{Binding Margin}" Width="*"/>
+                </DataGrid.Columns>
+              </DataGrid>
+            </TabItem>
+
           </TabControl>
         </StackPanel>
       </Border>
-    </Grid>
 
+    </Grid>
   </Grid>
 </UserControl>
