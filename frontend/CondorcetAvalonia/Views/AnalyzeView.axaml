@@ -1,0 +1,202 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:CondorcetAvalonia.ViewModels"
+             x:Class="CondorcetAvalonia.Views.AnalyzeView"
+             x:DataType="vm:AnalyzeViewModel">
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="2*"/>
+      <ColumnDefinition Width="3*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- LEFT -->
+    <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,12,0">
+      <StackPanel>
+
+        <!-- Summary -->
+        <Border Background="#EEF2FF"
+        BorderBrush="#C7D2FE"
+        BorderThickness="1"
+        CornerRadius="10"
+        Padding="12"
+        Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Summary" FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <TextBlock Text="{Binding SummaryLine1}" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding SummaryLine2}" Margin="0,6,0,0"/>
+            <TextBlock Text="{Binding CycleText}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding LastArtifactRunId, StringFormat=Artifact run: {0}}"
+                       Margin="0,10,0,0"
+                       Foreground="#6B7280"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Winners -->
+        <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Winners" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+            <DataGrid ItemsSource="{Binding WinnersRows}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Height="180">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Method" Binding="{Binding Method}" Width="*"/>
+                <DataGridTextColumn Header="Winner" Binding="{Binding Winner}" Width="*"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </StackPanel>
+        </Border>
+
+        <!-- Borda -->
+        <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Scores (Borda)" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+            <DataGrid ItemsSource="{Binding BordaRows}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Height="220">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </StackPanel>
+        </Border>
+
+        <!-- Plurality -->
+        <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Scores (Plurality)" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+            <DataGrid ItemsSource="{Binding PluralityRows}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Height="220">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </StackPanel>
+        </Border>
+
+        <!-- Copeland -->
+        <Border Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Scores (Copeland)" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+            <DataGrid ItemsSource="{Binding CopelandRows}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Height="220">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </StackPanel>
+        </Border>
+
+        <!-- Minimax -->
+        <Border Background="#F9FAFB" CornerRadius="10" Padding="12">
+          <StackPanel>
+            <TextBlock Text="Scores (Minimax / Simpson)" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+            <DataGrid ItemsSource="{Binding MinimaxRows}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Height="220">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Candidate" Binding="{Binding Candidate}" Width="*"/>
+                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="*"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- RIGHT -->
+    <Grid Grid.Column="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="2*"/>
+        <RowDefinition Height="3*"/>
+      </Grid.RowDefinitions>
+
+      <!-- Graph -->
+      <Border Grid.Row="0" Background="#F9FAFB" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Text="Graph" FontWeight="SemiBold" Margin="0,0,0,8"/>
+          <Border Background="White" CornerRadius="8" Padding="8">
+            <Image Source="{Binding GraphImage}" Stretch="Uniform"/>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- Matrices + Trace -->
+      <Border Grid.Row="1" Background="#F9FAFB" CornerRadius="10" Padding="12">
+        <StackPanel>
+          <TextBlock Text="Pairwise Matrices" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+          <TabControl>
+            <TabItem Header="DFS Simulation">
+              <Grid Margin="8">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8" Spacing="8">
+                  <Button Content="⟵ Prev" Width="90" Command="{Binding TracePrevCommand}"/>
+                  <Button Content="Next ⟶" Width="90" Command="{Binding TraceNextCommand}"/>
+                  <Button Content="Reset" Width="90" Command="{Binding TraceResetCommand}"/>
+                  <TextBlock Text="{Binding CurrentTraceIndex, StringFormat=Step: {0}}"
+                             Margin="16,0,0,0"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="1"
+                           Text="{Binding CurrentStackText, StringFormat=Stack: {0}}"
+                           Foreground="#374151"
+                           Margin="0,0,0,8"
+                           TextWrapping="Wrap"/>
+
+                <DataGrid Grid.Row="2"
+                          ItemsSource="{Binding TraceRows}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True">
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="60"/>
+                    <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="110"/>
+                    <DataGridTextColumn Header="u" Binding="{Binding U}" Width="70"/>
+                    <DataGridTextColumn Header="v" Binding="{Binding V}" Width="70"/>
+                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                    <DataGridTextColumn Header="Stack" Binding="{Binding Stack}" Width="220"/>
+                  </DataGrid.Columns>
+                </DataGrid>
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="A (wins)">
+              <DataGrid ItemsSource="{Binding MatrixARows}"
+                        AutoGenerateColumns="True"
+                        IsReadOnly="True"/>
+            </TabItem>
+
+            <TabItem Header="Margin">
+              <DataGrid ItemsSource="{Binding MatrixMarginRows}"
+                        AutoGenerateColumns="True"
+                        IsReadOnly="True"/>
+            </TabItem>
+          </TabControl>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+  </Grid>
+</UserControl>

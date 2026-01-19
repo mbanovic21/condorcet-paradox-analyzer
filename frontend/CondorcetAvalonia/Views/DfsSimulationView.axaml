@@ -1,0 +1,132 @@
+<UserControl
+    x:Class="CondorcetAvalonia.Views.DfsSimulationView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:CondorcetAvalonia.ViewModels"
+    x:DataType="vm:DfsSimulationViewModel">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- Controls -->
+    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+      <Button Content="Load last trace" Width="130" Margin="0,0,10,0"
+              Command="{Binding LoadFromLastAnalysisCommand}"/>
+
+      <Button Content="Prev" Width="70" Margin="0,0,6,0"
+              Command="{Binding PrevCommand}"/>
+
+      <Button Content="Next" Width="70" Margin="0,0,6,0"
+              Command="{Binding NextCommand}"/>
+
+      <Button Content="Reset" Width="70" Margin="0,0,12,0"
+              Command="{Binding ResetCommand}"/>
+
+      <Button Content="{Binding PlayPauseText}" Width="90" Margin="0,0,16,0"
+              Command="{Binding PlayPauseCommand}"/>
+
+      <TextBlock Text="Speed (ms):" VerticalAlignment="Center"/>
+      <Slider Minimum="50" Maximum="1200" Value="{Binding SpeedMs}" Width="160" Margin="10,0,0,0"/>
+
+      <TextBlock Text="{Binding Header}" VerticalAlignment="Center" Margin="16,0,0,0" Foreground="#374151"/>
+    </DockPanel>
+
+    <!-- Main -->
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="2.2*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- Graph -->
+      <Border Grid.Column="0" Background="#F9FAFB" CornerRadius="10" Padding="10" Margin="0,0,12,0">
+        <Viewbox Stretch="Uniform">
+          <Canvas Width="860" Height="560">
+
+            <!-- Edges -->
+            <ItemsControl ItemsSource="{Binding Edges}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <Canvas/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Canvas>
+                    <Line StartPoint="{Binding StartPoint}"
+                          EndPoint="{Binding EndPoint}"
+                          Stroke="{Binding Stroke}"
+                          StrokeThickness="{Binding StrokeThickness}"/>
+                    <Polygon Points="{Binding ArrowPoints}"
+                             Fill="{Binding ArrowFill}"/>
+                  </Canvas>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Nodes -->
+            <ItemsControl ItemsSource="{Binding Nodes}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <Canvas/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid Canvas.Left="{Binding X}"
+                        Canvas.Top="{Binding Y}"
+                        RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                      <!-- center node: 56x56 => shift by -28 -->
+                      <TranslateTransform X="-28" Y="-28"/>
+                    </Grid.RenderTransform>
+
+                    <Ellipse Width="56" Height="56"
+                             Fill="{Binding Fill}"
+                             Stroke="{Binding Stroke}"
+                             StrokeThickness="{Binding StrokeThickness}"/>
+                    <TextBlock Text="{Binding Id}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+          </Canvas>
+        </Viewbox>
+      </Border>
+
+      <!-- State panel -->
+      <Border Grid.Column="1" Background="#F9FAFB" CornerRadius="10" Padding="12">
+        <StackPanel>
+          <TextBlock Text="DFS State" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+          <TextBlock Text="{Binding StackText, StringFormat=Stack: {0}}"
+                     TextWrapping="Wrap"
+                     Foreground="#374151"
+                     Margin="0,0,0,8"/>
+
+          <TextBlock Text="{Binding MessageText, StringFormat=Message: {0}}"
+                     TextWrapping="Wrap"
+                     Foreground="#6B7280"
+                     Margin="0,0,0,12"/>
+
+          <TextBlock Text="Legend" FontWeight="SemiBold" Margin="0,0,0,6"/>
+          <TextBlock Text="WHITE = unvisited" Foreground="#6B7280"/>
+          <TextBlock Text="GRAY = in recursion stack" Foreground="#6B7280"/>
+          <TextBlock Text="BLACK = finished" Foreground="#6B7280"/>
+          <TextBlock Text="Blue border = on current DFS stack" Foreground="#6B7280"/>
+          <TextBlock Text="Blue edge = currently inspected" Foreground="#6B7280"/>
+          <TextBlock Text="Red edges = detected cycle" Foreground="#6B7280"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>
